@@ -1,0 +1,661 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>STB ONE - Route Pick All</title>
+<style>
+:root{--bg:#07101c;--panel:#111c2d;--panel2:#17243a;--line:#344763;--text:#f7f9fc;--muted:#aab6c9;--red:#b52543;--green:#1f7a4b;--gold:#d9a12c}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#050a12,#0a1524);color:var(--text);font-family:Arial,sans-serif;min-height:100vh}
+.app{max-width:580px;margin:auto;min-height:100vh;padding:18px 16px 92px}.hidden{display:none!important}
+.logo{width:86px;height:86px;margin:10px auto 14px;border-radius:22px;display:grid;place-items:center;font-weight:900;font-size:27px;background:linear-gradient(145deg,#17345f,#b52543);border:1px solid #667895}
+h1,h2,h3{margin:0 0 12px}.center{text-align:center}.muted{color:var(--muted)}
+.card{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:18px;padding:16px;margin:12px 0}
+label{display:block;font-weight:800;margin:11px 0 6px}
+input,select,textarea{width:100%;padding:13px;border-radius:12px;border:1px solid #425571;background:#08111f;color:#fff;font-size:16px}
+textarea{min-height:84px}.btn{width:100%;touch-action:manipulation;-webkit-tap-highlight-color:transparent;border:1px solid #465a78;background:#243550;color:#fff;border-radius:12px;padding:13px;font-size:15px;font-weight:800;margin-top:9px}
+.btn.primary{background:linear-gradient(#ca3154,#a31e3d)}.btn.green{background:linear-gradient(#25845a,#17633f)}.btn.warn{background:#6a4b13}
+.badge{display:inline-block;background:#173f2c;color:#bbf5d4;padding:5px 9px;border-radius:999px;font-size:11px;font-weight:900}
+.topbar{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:12px}.topbar .btn{width:auto;margin:0;padding:9px 10px}
+.tabbar{position:fixed;bottom:0;left:0;right:0;background:#08111fea;border-top:1px solid #344763;display:flex;gap:6px;overflow-x:auto;padding:8px;z-index:20}
+.tabbar button{min-width:90px;border:1px solid #334763;background:#132038;color:#dbe6f7;border-radius:10px;padding:10px 8px;font-size:12px;font-weight:800}
+.tabbar button.active{background:#b52543;border-color:#d14d68}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.metric{background:#0d1727;border:1px solid #30435e;border-radius:14px;padding:14px;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}.metric:active{transform:scale(.99)}
+.metric span{display:block;color:var(--muted);font-size:12px}.metric strong{display:block;font-size:23px;margin-top:5px}
+.list{display:grid;gap:10px}.item{background:#0c1728;border:1px solid #31435e;border-radius:13px;padding:13px}
+.row{display:flex;justify-content:space-between;gap:10px;align-items:center}.pill{font-size:11px;font-weight:900;padding:5px 8px;border-radius:999px;background:#533918;color:#ffd995}
+.section{display:none}.section.active{display:block}.actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}.actions .btn{margin-top:0}
+.modal{position:fixed;inset:0;background:rgba(2,6,12,.94);z-index:9999;display:none;align-items:flex-start;justify-content:center;padding:18px 10px;overflow-y:auto;-webkit-overflow-scrolling:touch}.modal.open{display:flex!important}
+.sheet{width:100%;max-width:580px;min-height:calc(100vh - 36px);background:#101b2c;border:1px solid #435978;border-radius:18px;padding:18px;box-shadow:0 20px 60px rgba(0,0,0,.55)}
+.sheethead{display:flex;justify-content:space-between;align-items:center;gap:10px}.close{width:auto!important;padding:9px 12px!important;margin:0!important}
+.notice{padding:11px;border-radius:11px;margin-top:10px;background:#163e2b;color:#c8f6d9}.danger{background:#541928;color:#ffd1da}
+.small{font-size:12px}
+.product-row{display:grid;grid-template-columns:72px 1fr;gap:12px;align-items:center}.product-thumb{width:72px;height:72px;border-radius:12px;object-fit:cover;background:#152238;border:1px solid #425571}.product-placeholder{width:72px;height:72px;border-radius:12px;background:#152238;border:1px solid #425571;display:grid;place-items:center;color:#8090a8;font-size:11px;text-align:center;padding:5px}.product-large{width:100%;max-height:340px;object-fit:contain;border-radius:14px;background:#08111f;border:1px solid #425571}.pick-product{display:grid;grid-template-columns:54px 1fr auto;gap:10px;align-items:center;padding:9px 0;border-top:1px solid #263a55}.pick-product:first-child{border-top:0}.pick-product img,.pick-product .product-placeholder{width:54px;height:54px}.pick-done{opacity:.55}.qty-input{width:84px!important;padding:9px!important}.preview-box{margin-top:10px}.preview-box img{width:130px;height:130px;object-fit:cover;border-radius:14px;border:1px solid #425571;background:#08111f}.signature-pad{width:100%;height:180px;background:#fff;border:2px solid #425571;border-radius:12px;touch-action:none;display:block}.payment-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.payment-summary{background:#0b1626;border:1px solid #31435e;border-radius:12px;padding:12px;margin-top:10px}.invoice-preview{background:#fff;color:#111;border-radius:12px;padding:18px;margin-top:12px}.invoice-preview table{width:100%;border-collapse:collapse}.invoice-preview th,.invoice-preview td{border-bottom:1px solid #ddd;padding:8px;text-align:left;font-size:13px}.invoice-preview .right{text-align:right}.invoice-copy-label{font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:#555}
+.store-pick-details{background:#0c1728;border:1px solid #31435e;border-radius:13px;overflow:hidden}.store-pick-details summary{list-style:none;cursor:pointer;padding:14px;touch-action:manipulation;-webkit-tap-highlight-color:transparent}.store-pick-details summary::-webkit-details-marker{display:none}.store-pick-details[open] summary{border-bottom:1px solid #31435e}.store-pick-body{padding:0 14px 14px}.store-toggle-label{font-size:12px;font-weight:900;color:#cdd8e8;margin-top:5px}.store-pick-details summary:after{content:"Open";display:block;font-size:11px;font-weight:900;color:#9fb0c8;margin-top:7px}.store-pick-details[open] summary:after{content:"Close"}
+
+.chat-list{display:flex;flex-direction:column;gap:10px;max-height:58vh;overflow-y:auto;padding:4px 2px 12px}.chat-message{max-width:88%;padding:11px 12px;border-radius:14px;background:#14233a;border:1px solid #344763}.chat-message.mine{align-self:flex-end;background:#4b1d2d;border-color:#8b3550}.chat-meta{font-size:11px;color:var(--muted);margin-bottom:5px}.chat-text{white-space:pre-wrap;overflow-wrap:anywhere}.chat-compose{position:sticky;bottom:72px;background:#101b2c;padding-top:10px}.chat-compose textarea{min-height:70px}.chat-empty{text-align:center;padding:24px;color:var(--muted)}
+.chat-switch{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}.chat-switch .btn{margin:0}.chat-panel{display:none}.chat-panel.active{display:block}.dm-recipient{margin-bottom:10px}.privacy-note{font-size:11px;color:var(--muted);margin-top:8px}
+
+/* STB branding */
+body:before{content:"";position:fixed;inset:0;background:linear-gradient(rgba(5,10,18,.86),rgba(10,21,36,.92)),url("stb-logo.jpg") center/cover no-repeat;opacity:.34;pointer-events:none;z-index:-1}
+body{background:#050a12}.app{position:relative;z-index:1}
+.logo{width:210px;height:140px;padding:0;background:#050a12;border-color:#4b5e7d;overflow:hidden}
+.logo img{width:100%;height:100%;object-fit:contain;display:block}
+.brand-mini{width:100%;max-width:220px;height:auto;display:block;margin:0 auto 10px}
+.invoice-brand{width:190px;max-height:120px;object-fit:contain;display:block;margin:0 0 10px}
+@media(max-width:420px){.logo{width:190px;height:126px}}
+
+.ops-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.ops-card{background:#0c1728;border:1px solid #31435e;border-radius:14px;padding:13px}.ops-card h4{margin:0 0 6px}.table-wrap{overflow-x:auto}.mini-table{width:100%;border-collapse:collapse;font-size:12px}.mini-table th,.mini-table td{padding:8px;border-bottom:1px solid #263a55;text-align:left;white-space:nowrap}.alert-low{border-color:#9a3a4f;background:#321520}.profit-positive{color:#9df1bf}.profit-negative{color:#ff9dad}.permission-grid{display:grid;gap:8px}.permission-row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;background:#0c1728;border:1px solid #31435e;border-radius:12px;padding:10px}
+</style>
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+
+<meta name="theme-color" content="#07101c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="STB ONE">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+</head>
+<body>
+<div class="app">
+<section id="loginView">
+<div class="logo"><img src="stb-logo.jpg" alt="STB Distribution logo"></div><h1 class="center">STB ONE</h1><div class="center small muted">Store Info Fix v32</div><p class="center muted">One Company. One App. One System.</p>
+<div class="card">
+<label>Employee Email</label>
+<input id="email" type="email" autocomplete="username" placeholder="name@stbdistribution.com">
+<label>Password</label><input id="password" type="password" autocomplete="current-password" placeholder="Enter password">
+<button class="btn primary" id="loginBtn">Sign In</button>
+<div id="loginError" class="notice danger hidden">Email or password is incorrect.</div>
+</div>
+<div class="card small muted">Each employee now signs in with their own email and password. Access is assigned by the role stored on their secure account.</div>
+</section>
+
+<section id="appView" class="hidden">
+<div class="topbar"><div><span id="roleBadge" class="badge"></span><h2 id="pageTitle" style="margin-top:8px">Dashboard</h2></div><div><div id="syncStatus" class="small muted" style="text-align:right;margin-bottom:5px">Connecting…</div><div style="display:flex;gap:7px;justify-content:flex-end"><button class="btn" id="topChatBtn" type="button">Messages</button><button class="btn" id="logoutBtn">Log Out</button></div></div></div>
+<section class="section active" data-section="dashboard">
+<div class="grid"><div class="metric" role="button" tabindex="0" onclick="openDashboardDetail('sales')"><span>Sales Today</span><strong id="salesMetric">$0</strong><div class="small muted">Tap for today / week / month / year</div></div><div class="metric" role="button" tabindex="0" onclick="openDashboardDetail('collections')"><span>Collections</span><strong id="collectionsMetric">$0</strong><div class="small muted">Tap for payment breakdown</div></div><div class="metric" role="button" tabindex="0" onclick="openDashboardDetail('partners')"><span>Partners</span><strong id="partnersMetric">0</strong><div class="small muted">Tap to view stores</div></div><div class="metric" role="button" tabindex="0" onclick="openDashboardDetail('stock')"><span>Low Stock</span><strong id="lowMetric">0</strong><div class="small muted">Tap to view products</div></div></div>
+<div class="card"><h3>Recent Activity</h3><div id="activityList" class="list"></div></div>
+</section>
+
+<section class="section" data-section="inventory">
+<div class="card"><h3>Inventory</h3><label>Search Products</label><input id="inventorySearch" type="search" placeholder="Search name, SKU, barcode, aisle, rack, shelf, or zone"><div id="inventorySearchCount" class="muted small" style="margin-top:7px"></div><div id="inventoryList" class="list" style="margin-top:10px"></div><button class="btn primary" onclick="openModal('productModal')">Add Product</button></div>
+</section>
+
+<section class="section" data-section="partners">
+<div class="card"><h3>Partners</h3><div id="partnerList" class="list"></div><button class="btn primary" onclick="openModal('partnerModal')">Add Partner</button></div>
+</section>
+
+<section class="section" data-section="routes">
+<div class="card"><h3>Routes</h3><div id="routeList" class="list"></div><button class="btn primary" onclick="openModal('routeModal')">Add Route Stop</button></div>
+</section>
+
+<section class="section" data-section="warehouse">
+<div class="card"><h3>Warehouse Picking</h3><p class="muted small">Each store list shows the product, quantity to pick, and its aisle/rack/shelf location.</p><label>Scan or enter barcode</label><input id="scanCode" inputmode="text" placeholder="Barcode / SKU"><button class="btn primary" id="scanCaseBtn" type="button">Scan Picked Case</button><button class="btn" id="cameraScanBtn" type="button">Use Camera Scanner</button><div id="scanResult" class="notice hidden"></div></div>
+<div class="card"><h3>Store Pick Lists</h3><label>Search Pick Lists</label><input id="warehouseProductSearch" type="search" placeholder="Search store, product, SKU, or warehouse location"><div class="notice"><b>How to pick:</b> Go to the FROM location shown under each product, pull the remaining cases, then scan each case.</div><div id="loadList" class="list"></div><button class="btn green" onclick="completeLoad()">Mark All Ready for Route</button></div>
+</section>
+
+
+<section class="section" data-section="chat">
+<div class="card"><div class="row"><div><h3 style="margin:0">STB Messages</h3><div class="muted small">Team-wide chat and private direct messages</div></div><button class="btn" id="refreshChatBtn" type="button" style="width:auto;margin:0">Refresh</button></div><div class="chat-switch"><button class="btn primary" id="teamChatTabBtn" type="button">Team Chat</button><button class="btn" id="directChatTabBtn" type="button">Personal Chat</button></div></div><div class="card"><h3>Team Members</h3><div id="teamDirectory" class="list"></div></div>
+<div id="teamChatPanel" class="chat-panel active"><div class="card"><div id="chatList" class="chat-list"></div><div class="chat-compose"><label>Message to Everyone</label><textarea id="chatInput" maxlength="1000" placeholder="Type a message to the team..."></textarea><button class="btn primary" id="sendChatBtn" type="button">Send to Team</button><div id="chatStatus" class="notice hidden"></div></div></div></div>
+<div id="directChatPanel" class="chat-panel"><div class="card"><label>Message Who?</label><select id="directRecipient" class="dm-recipient"></select><div class="privacy-note">Only you and the selected employee account can load this conversation.</div></div><div class="card"><div id="directChatList" class="chat-list"></div><div class="chat-compose"><label>Private Message</label><textarea id="directChatInput" maxlength="1000" placeholder="Type a private message..."></textarea><button class="btn primary" id="sendDirectChatBtn" type="button">Send Private Message</button><div id="directChatStatus" class="notice hidden"></div></div></div></div>
+</section>
+
+
+<section class="section" data-section="operations">
+<div class="card"><h3>Business Controls</h3><div class="muted small">Vendors, purchasing, returns, pricing rules, history, alerts, scheduling, permissions, exports, and profit.</div></div>
+<div class="ops-grid">
+ <button class="ops-card btn" onclick="openOpsPanel('vendors')"><h4>Vendors & POs</h4><span class="small muted">Suppliers and purchase orders</span></button>
+ <button class="ops-card btn" onclick="openOpsPanel('returns')"><h4>Returns & Damage</h4><span class="small muted">Returned, damaged, missing, refused</span></button>
+ <button class="ops-card btn" onclick="openOpsPanel('pricing')"><h4>Taxes & Fees</h4><span class="small muted">Discounts, taxes, delivery fees</span></button>
+ <button class="ops-card btn" onclick="openOpsPanel('history')"><h4>Inventory History</h4><span class="small muted">Every stock change and reason</span></button>
+ <button class="ops-card btn" onclick="openOpsPanel('alerts')"><h4>Low-Stock Alerts</h4><span class="small muted">Products at reorder level</span></button>
+ <button class="ops-card btn" onclick="openOpsPanel('schedule')"><h4>Route Scheduling</h4><span class="small muted">Driver, truck, date, departure</span></button>
+ <button class="ops-card btn" onclick="openOpsPanel('orders')"><h4>Store Order History</h4><span class="small muted">Orders, payments, invoices</span></button>
+ <button class="ops-card btn" onclick="openOpsPanel('permissions')"><h4>Permissions</h4><span class="small muted">Control what each role can change</span></button>
+ <button class="ops-card btn" onclick="openOpsPanel('exports')"><h4>Backup & Export</h4><span class="small muted">CSV and full JSON backup</span></button>
+ <button class="ops-card btn" onclick="openOpsPanel('profit')"><h4>Cost & Profit</h4><span class="small muted">Revenue, cost, and margin</span></button>
+</div>
+</section>
+
+<section class="section" data-section="sales">
+<div class="card"><h3>Sales Prospects</h3><div id="salesList" class="list"></div><button class="btn primary" onclick="openNewProspectForm()">Add Prospect</button></div>
+</section>
+
+<section class="section" data-section="employees">
+<div class="card"><h3>Team</h3><div id="employeeList" class="list"></div><button class="btn primary" onclick="openModal('employeeModal')">Add Employee</button></div>
+</section>
+<nav class="tabbar" id="tabbar"></nav>
+</section>
+</div>
+
+<div class="modal" id="productModal"><div class="sheet"><div class="sheethead"><h3>Add Product</h3><button class="btn close" onclick="closeModal('productModal')">Close</button></div>
+<label>Name</label><input id="pName"><label>Product Photo</label><input id="pImage" type="file" accept="image/*" capture="environment"><button class="btn" id="takeProductPhotoBtn" type="button">Take or Choose Product Photo</button><div id="productImagePreview" class="preview-box hidden"><img id="productPreviewImg" alt="Product preview"></div><label>SKU / Barcode</label><input id="pSku" inputmode="text" placeholder="Scan or enter barcode"><button class="btn" id="scanProductBarcodeBtn" type="button">Scan Product Barcode</button><h3 style="margin-top:18px">Warehouse Location</h3><div class="grid"><div><label>Aisle</label><input id="pAisle" placeholder="A3"></div><div><label>Rack</label><input id="pRack" placeholder="R2"></div><div><label>Shelf / Bin</label><input id="pShelf" placeholder="Shelf 4"></div><div><label>Pallet Zone</label><input id="pZone" placeholder="Zone B"></div></div><label>Case price</label><input id="pPrice" type="number" min="0" step="0.01" value="0" placeholder="Price per case"><label>Cases</label><input id="pQty" type="number" value="0"><label>Reorder level</label><input id="pLow" type="number" value="5"><button class="btn primary" id="saveProductBtn" type="button">Save Product</button><div id="productResult" class="notice hidden"></div></div></div>
+
+<div class="modal" id="productViewModal"><div class="sheet"><div class="sheethead"><h3 id="productViewName">Product</h3><button class="btn close" onclick="closeModal('productViewModal')">Close</button></div><img id="productViewImage" class="product-large" alt="Product image"><div id="productViewInfo" class="card"></div></div></div>
+
+<div class="modal" id="partnerModal"><div class="sheet"><div class="sheethead"><h3>Add Partner</h3><button class="btn close" onclick="closeModal('partnerModal')">Close</button></div>
+<label>Business name</label><input id="partnerName"><label>Address</label><input id="partnerAddress"><label>Starting balance</label><input id="partnerBalance" type="number" value="0"><button class="btn primary" onclick="savePartner()">Save Partner</button></div></div>
+
+<div class="modal" id="routeDetailsModal"><div class="sheet"><div class="sheethead"><h3 id="routeDetailsStore">Store Details</h3><button class="btn close" onclick="closeModal('routeDetailsModal')">Close</button></div>
+<div id="routeDetailsAddress" class="notice"></div>
+<div class="actions" style="margin-top:10px"><button class="btn" id="routeInfoTabBtn" onclick="showRouteDetailTab('info')">Store Info</button><button class="btn primary" id="routePickTabBtn" onclick="showRouteDetailTab('pick')">Pick From Pallet</button></div>
+<div id="routeInfoPanel" class="card"></div>
+<div id="routePickPanel" class="card hidden"></div>
+</div></div>
+
+<div class="modal" id="routeModal"><div class="sheet"><div class="sheethead"><h3>Add Route Stop</h3><button class="btn close" onclick="closeModal('routeModal')">Close</button></div>
+<label>Store</label><select id="routePartner"></select><label>Products Requested</label><input id="routeProductSearch" type="search" placeholder="Search products by name or SKU"><div id="routeOrderItems" class="list"></div><div class="notice" id="routeCaseSummary">0 total cases</div><label>Amount to collect</label><input id="routeAmount" type="number" value="0"><button class="btn primary" onclick="saveRoute()">Send Order to Warehouse</button></div></div>
+
+<div class="modal" id="podModal"><div class="sheet"><div class="sheethead"><h3>Complete Delivery & Payment</h3><button class="btn close" onclick="closeModal('podModal')">Close</button></div>
+<input type="hidden" id="podId"><label>Receiver name</label><input id="podReceiver" placeholder="Person receiving delivery"><div class="payment-grid"><div><label>Payment collected</label><input id="podPayment" type="number" min="0" step="0.01" value="0"></div><div><label>Payment method</label><select id="podPaymentMethod"><option value="Cash">Cash</option><option value="Check">Check</option><option value="Card">Card</option><option value="ACH">ACH / Bank Transfer</option><option value="Money Order">Money Order</option><option value="No Payment">No Payment Collected</option><option value="Other">Other</option></select></div></div><div id="checkDetails" class="hidden"><label>Check number</label><input id="podCheckNumber" inputmode="numeric" placeholder="Enter check number"></div><label>Payment reference / note</label><input id="podPaymentReference" placeholder="Last 4 digits, transaction ID, or note"><label>Delivery notes</label><textarea id="podNotes"></textarea><label>Typed signer name</label><input id="podSignerName" placeholder="Type the name exactly as signed"><label>Customer signature</label><canvas id="signaturePad" class="signature-pad"></canvas><div class="actions" style="margin-top:8px"><button class="btn" id="clearSignatureBtn" type="button">Clear Signature</button><button class="btn" id="confirmSignatureBtn" type="button">Use Signature</button></div><div id="signatureStatus" class="notice danger">Signature required</div><button class="btn green" onclick="completeStop()">Complete Stop</button></div></div>
+
+<div class="modal" id="invoiceModal"><div class="sheet"><div class="sheethead"><h3>Delivery Invoices</h3><button class="btn close" onclick="closeModal('invoiceModal')">Close</button></div><div class="notice">Two invoice copies are ready from the completed delivery.</div><div class="actions" style="margin-top:10px"><button class="btn primary" id="partnerInvoiceBtn" type="button">Partner Copy</button><button class="btn green" id="stbInvoiceBtn" type="button">STB Copy</button></div><div id="invoicePreview" class="invoice-preview"></div></div></div>
+
+<div class="modal" id="salesModal"><div class="sheet"><div class="sheethead"><h3 id="salesModalTitle">Add Prospect</h3><button class="btn close" onclick="closeModal('salesModal')">Close</button></div>
+<label>Business name</label><input id="sName" placeholder="Store or business name">
+<label>Store address</label><input id="sAddress" placeholder="Street, city, state, ZIP">
+<div class="grid"><div><label>Contact person</label><input id="sContact" placeholder="Contact name"></div><div><label>Phone</label><input id="sPhone" type="tel" placeholder="Phone number"></div></div>
+<label>Email</label><input id="sEmail" type="email" placeholder="Email address">
+<label>Prospect notes</label><textarea id="sNotes" placeholder="What they need, follow-up details, pricing discussed, or other notes"></textarea>
+<label>Status</label><select id="sStatus"><option>New</option><option>Follow-up</option><option>Quoted</option><option>Won</option></select>
+<h3 style="margin-top:18px">Proposed First Order</h3><div class="muted small">Enter the products and case quantities they want. When this prospect is won, this order is sent to Warehouse automatically.</div>
+<div id="salesOrderItems" class="list" style="margin-top:10px"></div><div id="salesCaseSummary" class="notice">0 total cases</div>
+<label>Calculated order total</label><input id="sAmount" type="number" min="0" step="0.01" value="0" readonly><div class="muted small" style="margin-top:6px">This total updates automatically from each product’s saved case price.</div>
+<button class="btn primary" id="saveProspectBtn" onclick="saveProspect()">Save Prospect</button></div></div>
+
+<div class="modal" id="employeeModal"><div class="sheet"><div class="sheethead"><h3>Add Employee</h3><button class="btn close" onclick="closeModal('employeeModal')">Close</button></div>
+<label>Name</label><input id="eName"><label>Work Email</label><input id="eEmail" type="email" placeholder="employee@stbdistribution.com"><label>Team / Department</label><select id="eRole"><option value="Management">Management</option><option value="Warehouse">Warehouse</option><option value="Routes">Routes</option><option value="Sales">Sales</option></select><label>Job Title</label><input id="eTitle" placeholder="Picker, Route Specialist, Sales Rep, Manager"><button class="btn primary" onclick="saveEmployee()">Add Employee to Team</button></div></div>
+
+
+<div class="modal" id="opsModal"><div class="sheet"><div class="sheethead"><h3 id="opsTitle">Business Controls</h3><button class="btn close" onclick="closeModal('opsModal')">Close</button></div><div id="opsBody"></div></div></div>
+
+<div class="modal" id="prospectDetailsModal"><div class="sheet"><div class="sheethead"><h3 id="prospectDetailsTitle">Prospect Details</h3><button class="btn close" onclick="closeModal('prospectDetailsModal')">Close</button></div><div id="prospectDetailsBody" class="card"></div></div></div>
+
+<div class="modal" id="dashboardDetailsModal"><div class="sheet"><div class="sheethead"><h3 id="dashboardDetailsTitle">Dashboard Details</h3><button class="btn close" onclick="closeModal('dashboardDetailsModal')">Close</button></div><div id="dashboardDetailsBody"></div></div></div>
+
+<script>
+const defaults={
+ inventory:[{id:1,name:'Premium Paper Towels',sku:'STB-PT-001',qty:18,low:5},{id:2,name:'Kitchen Trash Bags',sku:'STB-TB-014',qty:4,low:6},{id:3,name:'Foam Cups',sku:'STB-FC-008',qty:27,low:8}],
+ partners:[{id:1,name:'Quick Stop Market',address:'120 Main Street',balance:425},{id:2,name:'Carolina Corner Store',address:'88 Carolina Ave',balance:450}],
+ routes:[{id:1,partnerId:1,cases:8,amount:425,status:'Pending'},{id:2,partnerId:2,cases:10,amount:450,status:'Pending'}],
+ sales:[{id:1,name:'Downtown Mart',contact:'James',status:'Follow-up'}],
+ employees:[{id:1,name:'Warehouse Team',role:'Warehouse',active:true},{id:2,name:'Route Specialist',role:'Route Specialist',active:true},{id:3,name:'Sales Team',role:'Sales',active:true}],
+ activity:['System ready'],
+ chatMessages:[],
+ vendors:[],purchaseOrders:[],returns:[],inventoryHistory:[],settings:{taxRate:0,deliveryFee:0,defaultDiscount:0},permissions:{},trucks:[]
+};
+const $=id=>document.getElementById(id);
+const loginView=$('loginView'), appView=$('appView'), emailInput=$('email'), passwordInput=$('password'), loginBtn=$('loginBtn'), logoutBtn=$('logoutBtn'), loginError=$('loginError'), roleBadge=$('roleBadge'), pageTitle=$('pageTitle'), tabbar=$('tabbar');
+const SUPABASE_URL='https://ijbyfxxykueujunshtsy.supabase.co';
+const SUPABASE_KEY='sb_publishable_5nrx2r9mdJ_nbitdZHcMrw_uWZtrnYw';
+const STATE_URL=SUPABASE_URL+'/rest/v1/stb_one_state?id=eq.main&select=data,updated_at';
+const DIRECT_MESSAGES_URL=SUPABASE_URL+'/rest/v1/stb_direct_messages';
+const STB_ACCOUNTS=[
+  {name:'Owner',email:'owner@stbdistribution.com'},
+  {name:'Manager',email:'manager@stbdistribution.com'},
+  {name:'Warehouse',email:'warehouse@stbdistribution.com'},
+  {name:'Route Specialist',email:'route@stbdistribution.com'},
+  {name:'Sales',email:'sales@stbdistribution.com'}
+];
+let data=defaults;
+let currentRole='';
+let authSession=JSON.parse(localStorage.getItem('stb_auth_session')||'null');
+const inventoryList=$('inventoryList'), partnerList=$('partnerList'), routeList=$('routeList'), salesList=$('salesList'), employeeList=$('employeeList'), activityList=$('activityList'), loadList=$('loadList'), salesMetric=$('salesMetric'), collectionsMetric=$('collectionsMetric'), partnersMetric=$('partnersMetric'), lowMetric=$('lowMetric'), routePartner=$('routePartner'), routeCases=$('routeCases'), routeAmount=$('routeAmount'), podId=$('podId'), podReceiver=$('podReceiver'), podPayment=$('podPayment'), podNotes=$('podNotes'), podSignerName=$('podSignerName'), podPaymentMethod=$('podPaymentMethod'), podCheckNumber=$('podCheckNumber'), podPaymentReference=$('podPaymentReference'), checkDetails=$('checkDetails'), signaturePad=$('signaturePad'), clearSignatureBtn=$('clearSignatureBtn'), confirmSignatureBtn=$('confirmSignatureBtn'), signatureStatus=$('signatureStatus'), scanCode=$('scanCode'), scanResult=$('scanResult'), pName=$('pName'), pSku=$('pSku'), pAisle=$('pAisle'), pRack=$('pRack'), pShelf=$('pShelf'), pZone=$('pZone'), pCost=$('pCost'), pPrice=$('pPrice'), pQty=$('pQty'), pLow=$('pLow'), partnerName=$('partnerName'), partnerAddress=$('partnerAddress'), partnerBalance=$('partnerBalance'), sName=$('sName'), sContact=$('sContact'), sStatus=$('sStatus'), eName=$('eName'), eEmail=$('eEmail'), eRole=$('eRole'), syncStatus=$('syncStatus'), saveProductBtn=$('saveProductBtn'), productResult=$('productResult'), scanCaseBtn=$('scanCaseBtn'), cameraScanBtn=$('cameraScanBtn'), scanProductBarcodeBtn=$('scanProductBarcodeBtn'), pImage=$('pImage'), takeProductPhotoBtn=$('takeProductPhotoBtn'), productImagePreview=$('productImagePreview'), productPreviewImg=$('productPreviewImg'), routeOrderItems=$('routeOrderItems'), routeCaseSummary=$('routeCaseSummary'), productViewName=$('productViewName'), productViewImage=$('productViewImage'), productViewInfo=$('productViewInfo'), routeDetailsStore=$('routeDetailsStore'), routeDetailsAddress=$('routeDetailsAddress'), routeInfoPanel=$('routeInfoPanel'), routePickPanel=$('routePickPanel'), routeInfoTabBtn=$('routeInfoTabBtn'), routePickTabBtn=$('routePickTabBtn'), partnerInvoiceBtn=$('partnerInvoiceBtn'), stbInvoiceBtn=$('stbInvoiceBtn'), invoicePreview=$('invoicePreview');
+const opsTitle=$('opsTitle'),opsBody=$('opsBody');
+const prospectDetailsTitle=$('prospectDetailsTitle'), prospectDetailsBody=$('prospectDetailsBody'), dashboardDetailsTitle=$('dashboardDetailsTitle'), dashboardDetailsBody=$('dashboardDetailsBody');
+const teamDirectory=$('teamDirectory'), chatList=$('chatList'), chatInput=$('chatInput'), sendChatBtn=$('sendChatBtn'), refreshChatBtn=$('refreshChatBtn'), chatStatus=$('chatStatus'), teamChatTabBtn=$('teamChatTabBtn'), directChatTabBtn=$('directChatTabBtn'), teamChatPanel=$('teamChatPanel'), directChatPanel=$('directChatPanel'), directRecipient=$('directRecipient'), directChatList=$('directChatList'), directChatInput=$('directChatInput'), sendDirectChatBtn=$('sendDirectChatBtn'), directChatStatus=$('directChatStatus');
+let directMessages=[];
+let activeChatMode='team';
+let activeRouteDetailId=null;
+let editingProspectId=null;
+let signatureHasInk=false;
+let signatureConfirmed=false;
+let signatureDrawing=false;
+let signatureCtx=null;
+let activeInvoiceRouteId=null;
+let pendingProductImage='';
+let saving=false;
+let lastServerUpdate='';
+function setSync(text,ok=true){const el=document.getElementById('syncStatus');if(el){el.textContent=text;el.style.color=ok?'#aab6c9':'#ffb0bd'}}
+async function loadShared(force=false){
+  if(saving)return;
+  try{
+    const r=await fetch(STATE_URL,{headers:{apikey:SUPABASE_KEY,Authorization:'Bearer '+authSession.access_token},cache:'no-store'});
+    if(!r.ok)throw new Error('Load failed');
+    const rows=await r.json();
+    if(rows[0]&&rows[0].data&&(force||rows[0].updated_at!==lastServerUpdate)){
+      data=rows[0].data;if(!Array.isArray(data.chatMessages))data.chatMessages=[];lastServerUpdate=rows[0].updated_at||'';renderAll();
+    }
+    setSync('Synced '+new Date().toLocaleTimeString([], {hour:'numeric',minute:'2-digit'}));
+  }catch(e){setSync('Offline — retrying',false)}
+}
+const roleTabs={owner:['dashboard','inventory','partners','routes','warehouse','sales','employees','operations'],manager:['dashboard','inventory','partners','routes','warehouse','sales','operations'],warehouse:['dashboard','inventory','warehouse'],route:['dashboard','routes','partners'],sales:['dashboard','sales','partners']};
+async function refreshSession(){
+  if(!authSession?.refresh_token)return false;
+  try{
+    const r=await fetch(SUPABASE_URL+'/auth/v1/token?grant_type=refresh_token',{method:'POST',headers:{apikey:SUPABASE_KEY,'Content-Type':'application/json'},body:JSON.stringify({refresh_token:authSession.refresh_token})});
+    if(!r.ok)throw new Error('Session expired');
+    authSession=await r.json();localStorage.setItem('stb_auth_session',JSON.stringify(authSession));return true;
+  }catch(e){localStorage.removeItem('stb_auth_session');authSession=null;return false}
+}
+function accountRole(){return authSession?.user?.app_metadata?.role||''}
+function openSignedInApp(){
+  currentRole=accountRole();
+  if(!roleTabs[currentRole])throw new Error('This account has no STB role assigned.');
+  loginView.classList.add('hidden');appView.classList.remove('hidden');
+  roleBadge.textContent=currentRole.toUpperCase();buildTabs();populateDirectRecipients();setSync('Connecting…');loadShared(true)
+}
+async function save(){
+  renderAll();saving=true;setSync('Saving…');
+  try{
+    const now=new Date().toISOString();
+    const r=await fetch(SUPABASE_URL+'/rest/v1/stb_one_state?id=eq.main',{method:'PATCH',headers:{apikey:SUPABASE_KEY,Authorization:'Bearer '+authSession.access_token,'Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify({data,updated_at:now})});
+    if(!r.ok)throw new Error(await r.text());
+    lastServerUpdate=now;setSync('Saved & shared');
+  }catch(e){setSync('Save failed — retry',false);console.error(e)}finally{saving=false}
+}
+function money(n){return '$'+Number(n||0).toFixed(2)}
+function logActivity(t){data.activity.unshift(new Date().toLocaleString()+': '+t);data.activity=data.activity.slice(0,12)}
+async function login(){
+  loginError.classList.add('hidden');loginBtn.disabled=true;loginBtn.textContent='Signing In…';
+  try{
+    const r=await fetch(SUPABASE_URL+'/auth/v1/token?grant_type=password',{method:'POST',headers:{apikey:SUPABASE_KEY,'Content-Type':'application/json'},body:JSON.stringify({email:emailInput.value.trim().toLowerCase(),password:passwordInput.value})});
+    if(!r.ok)throw new Error('Invalid login');
+    authSession=await r.json();localStorage.setItem('stb_auth_session',JSON.stringify(authSession));openSignedInApp();
+  }catch(e){loginError.textContent=e.message==='Invalid login'?'Email or password is incorrect.':e.message;loginError.classList.remove('hidden')}
+  finally{loginBtn.disabled=false;loginBtn.textContent='Sign In'}
+}
+async function logout(){
+  if(authSession?.access_token){try{await fetch(SUPABASE_URL+'/auth/v1/logout',{method:'POST',headers:{apikey:SUPABASE_KEY,Authorization:'Bearer '+authSession.access_token}})}catch(e){}}
+  localStorage.removeItem('stb_auth_session');authSession=null;currentRole='';appView.classList.add('hidden');loginView.classList.remove('hidden');passwordInput.value=''
+}
+loginBtn.onclick=login;document.getElementById('topChatBtn').onclick=()=>showSection('chat');logoutBtn.onclick=logout;passwordInput.addEventListener('keydown',e=>{if(e.key==='Enter')login()});
+(async function restoreLogin(){
+  if(!authSession)return;
+  const expiresAt=(authSession.expires_at||0)*1000;
+  if(expiresAt<Date.now()+60000 && !(await refreshSession()))return;
+  try{openSignedInApp()}catch(e){logout()}
+})();
+function buildTabs(){tabbar.innerHTML='';roleTabs[currentRole].forEach((t,i)=>{let b=document.createElement('button');b.textContent=t[0].toUpperCase()+t.slice(1);b.onclick=()=>showSection(t,b);if(i===0)b.classList.add('active');tabbar.appendChild(b)});showSection('dashboard',tabbar.firstChild)}
+function showSection(name,btn){document.querySelectorAll('.section').forEach(s=>s.classList.toggle('active',s.dataset.section===name));document.querySelectorAll('.tabbar button').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');pageTitle.textContent=name==='employees'?'Team':name[0].toUpperCase()+name.slice(1);if(name==='chat'&&activeChatMode==='direct')loadDirectMessages()}
+function openModal(id){
+  const modal=document.getElementById(id);
+  if(!modal){alert('This form is unavailable.');return;}
+  if(id==='routeModal'){fillPartnerSelect();renderRouteOrderItems();}
+  modal.classList.add('open');
+  modal.style.display='flex';
+  document.body.style.overflow='hidden';
+  modal.scrollTop=0;
+  setTimeout(()=>{const field=modal.querySelector('input:not([type=hidden]), select, textarea');if(field)field.focus({preventScroll:false});},100);
+}
+function closeModal(id){
+  const modal=document.getElementById(id);
+  if(!modal)return;
+  modal.classList.remove('open');
+  modal.style.display='none';
+  document.body.style.overflow='';
+}
+document.querySelectorAll('.modal').forEach(modal=>modal.addEventListener('click',e=>{if(e.target===modal)closeModal(modal.id)}));
+function normalizeBusinessData(){['vendors','purchaseOrders','returns','inventoryHistory','trucks'].forEach(k=>{if(!Array.isArray(data[k]))data[k]=[]});if(!data.settings)data.settings={taxRate:0,deliveryFee:0,defaultDiscount:0};if(!data.permissions)data.permissions={};(data.inventory||[]).forEach(p=>{p.cost=Number(p.cost||0);p.price=Number(p.price||0)});}
+function renderAll(){normalizeBusinessData();if(!Array.isArray(data.chatMessages))data.chatMessages=[];renderInventory();renderPartners();renderRoutes();renderSales();renderEmployees();renderTeamDirectory();renderDashboard();renderLoad();renderChat()}
+function productPicture(x,cls='product-thumb'){
+  return x.image?`<img class="${cls}" src="${x.image}" alt="${escapeHtml(x.name)}">`:`<div class="product-placeholder">No photo</div>`;
+}
+function escapeHtml(value){return String(value??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
+function warehouseLocation(x){const parts=[x.aisle&&('Aisle '+x.aisle),x.rack&&('Rack '+x.rack),x.shelf&&x.shelf,x.zone&&x.zone].filter(Boolean);return parts.length?parts.join(' • '):'Location not assigned'}
+function chatSenderName(){
+  const email=authSession?.user?.email||'Team member';
+  const role=currentRole?currentRole[0].toUpperCase()+currentRole.slice(1):'Team';
+  return role+' • '+email;
+}
+function renderChat(){
+  if(!chatList)return;
+  const messages=(Array.isArray(data.chatMessages)?data.chatMessages:[]).slice().sort((a,b)=>new Date(a.createdAt||0)-new Date(b.createdAt||0));
+  if(!messages.length){chatList.innerHTML='<div class="chat-empty">No messages yet. Start the team conversation.</div>';return;}
+  const myId=authSession?.user?.id||'';
+  chatList.innerHTML=messages.map(m=>`<div class="chat-message ${m.userId===myId?'mine':''}"><div class="chat-meta"><b>${escapeHtml(m.sender||'Team member')}</b> • ${escapeHtml(new Date(m.createdAt).toLocaleString())}</div><div class="chat-text">${escapeHtml(m.text)}</div></div>`).join('');
+  requestAnimationFrame(()=>{chatList.scrollTop=chatList.scrollHeight});
+}
+async function sendChatMessage(){
+  const text=(chatInput?.value||'').trim();
+  if(!text){chatStatus.textContent='Type a message first.';chatStatus.classList.remove('hidden');chatStatus.classList.add('danger');return;}
+  sendChatBtn.disabled=true;sendChatBtn.textContent='Sending…';
+  data.chatMessages=Array.isArray(data.chatMessages)?data.chatMessages:[];
+  data.chatMessages.push({id:Date.now()+'-'+Math.random().toString(36).slice(2,7),userId:authSession?.user?.id||'',sender:chatSenderName(),role:currentRole,text,createdAt:new Date().toISOString()});
+  data.chatMessages=data.chatMessages.slice(-300);
+  chatInput.value='';chatStatus.classList.add('hidden');
+  await save();
+  sendChatBtn.disabled=false;sendChatBtn.textContent='Send Message';
+}
+function teamAccounts(){
+  const combined=[...STB_ACCOUNTS,...(Array.isArray(data.employees)?data.employees:[]).filter(e=>e.active!==false&&e.email).map(e=>({name:e.name||e.role||'Team member',email:String(e.email).trim().toLowerCase()}))];
+  const seen=new Set();
+  return combined.filter(a=>{const email=String(a.email||'').trim().toLowerCase();if(!email||seen.has(email))return false;seen.add(email);a.email=email;return true});
+}
+function populateDirectRecipients(){
+  if(!directRecipient)return;
+  const me=(authSession?.user?.email||'').toLowerCase();
+  const previous=directRecipient.value;
+  directRecipient.innerHTML=teamAccounts().filter(a=>a.email!==me).map(a=>`<option value="${escapeHtml(a.email)}">${escapeHtml(a.name)} — ${escapeHtml(a.email)}</option>`).join('');
+  if([...directRecipient.options].some(o=>o.value===previous))directRecipient.value=previous;
+}
+function switchChatMode(mode){
+  activeChatMode=mode==='direct'?'direct':'team';
+  teamChatPanel.classList.toggle('active',activeChatMode==='team');
+  directChatPanel.classList.toggle('active',activeChatMode==='direct');
+  teamChatTabBtn.classList.toggle('primary',activeChatMode==='team');
+  directChatTabBtn.classList.toggle('primary',activeChatMode==='direct');
+  if(activeChatMode==='direct')loadDirectMessages();
+}
+async function loadDirectMessages(){
+  if(!directRecipient?.value||!authSession?.access_token)return;
+  const me=(authSession.user.email||'').toLowerCase();
+  const other=directRecipient.value.toLowerCase();
+  directChatList.innerHTML='<div class="chat-empty">Loading private conversation…</div>';
+  try{
+    const filter=`or=(and(sender_email.eq.${encodeURIComponent(me)},recipient_email.eq.${encodeURIComponent(other)}),and(sender_email.eq.${encodeURIComponent(other)},recipient_email.eq.${encodeURIComponent(me)}))&order=created_at.asc&limit=300`;
+    const r=await fetch(DIRECT_MESSAGES_URL+'?select=id,sender_email,recipient_email,sender_role,message,created_at&'+filter,{headers:{apikey:SUPABASE_KEY,Authorization:'Bearer '+authSession.access_token},cache:'no-store'});
+    if(!r.ok)throw new Error(await r.text());
+    directMessages=await r.json();renderDirectMessages();
+  }catch(e){directChatList.innerHTML='<div class="notice danger">Private messages could not load. Refresh and try again.</div>';console.error(e)}
+}
+function renderDirectMessages(){
+  if(!directChatList)return;
+  const me=(authSession?.user?.email||'').toLowerCase();
+  if(!directMessages.length){directChatList.innerHTML='<div class="chat-empty">No private messages with this person yet.</div>';return;}
+  directChatList.innerHTML=directMessages.map(m=>`<div class="chat-message ${String(m.sender_email).toLowerCase()===me?'mine':''}"><div class="chat-meta"><b>${escapeHtml(String(m.sender_email).toLowerCase()===me?'You':m.sender_role||m.sender_email)}</b> • ${escapeHtml(new Date(m.created_at).toLocaleString())}</div><div class="chat-text">${escapeHtml(m.message)}</div></div>`).join('');
+  requestAnimationFrame(()=>{directChatList.scrollTop=directChatList.scrollHeight});
+}
+async function sendDirectMessage(){
+  const text=(directChatInput?.value||'').trim(),recipient=(directRecipient?.value||'').trim().toLowerCase(),sender=(authSession?.user?.email||'').trim().toLowerCase();
+  directChatStatus.classList.add('hidden','danger');
+  if(!recipient){directChatStatus.textContent='Choose an employee first.';directChatStatus.classList.remove('hidden');directChatStatus.classList.add('danger');return;}
+  if(!text){directChatStatus.textContent='Type a private message first.';directChatStatus.classList.remove('hidden');directChatStatus.classList.add('danger');return;}
+  sendDirectChatBtn.disabled=true;sendDirectChatBtn.textContent='Sending…';
+  try{
+    const r=await fetch(DIRECT_MESSAGES_URL,{method:'POST',headers:{apikey:SUPABASE_KEY,Authorization:'Bearer '+authSession.access_token,'Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify({sender_email:sender,recipient_email:recipient,sender_role:currentRole,message:text})});
+    if(!r.ok)throw new Error(await r.text());
+    directChatInput.value='';await loadDirectMessages();
+  }catch(e){directChatStatus.textContent='Private message failed to send. Try again.';directChatStatus.classList.remove('hidden');directChatStatus.classList.add('danger');console.error(e)}
+  finally{sendDirectChatBtn.disabled=false;sendDirectChatBtn.textContent='Send Private Message'}
+}
+function saveProduct(){
+  const name=(pName.value||'').trim(),sku=(pSku.value||'').trim(),price=Math.max(0,Number(pPrice?.value)||0);
+  if(!name)return alert('Enter the product name');if(!sku)return alert('Enter or scan the barcode / SKU');
+  if(data.inventory.some(x=>String(x.sku||'').trim().toLowerCase()===sku.toLowerCase()))return alert('That barcode / SKU already exists.');
+  data.inventory.push({id:Date.now(),name,sku,price,qty:Math.max(0,Number(pQty.value)||0),low:Math.max(0,Number(pLow.value)||0),aisle:(pAisle.value||'').trim(),rack:(pRack.value||'').trim(),shelf:(pShelf.value||'').trim(),zone:(pZone.value||'').trim(),image:pendingProductImage||''});
+  logActivity('Product added: '+name+' at '+money(price)+' per case');
+  [pName,pSku,pAisle,pRack,pShelf,pZone,pPrice,pQty,pLow].forEach((e,i)=>{if(e)e.value=i===6?'0':i===7?'0':i===8?'5':''});pendingProductImage='';productImagePreview.classList.add('hidden');closeModal('productModal');save();
+}
+function openProductView(id){const x=data.inventory.find(i=>i.id===id);if(!x)return;productViewName.textContent=x.name;productViewImage.src=x.image||'stb-logo.jpg';productViewInfo.innerHTML=`<div><b>SKU / Barcode:</b> ${escapeHtml(x.sku||'')}</div><div style="margin-top:8px"><b>Case price:</b> ${money(Number(x.price)||0)}</div><div style="margin-top:8px"><b>Cases in stock:</b> ${Number(x.qty)||0}</div><div style="margin-top:8px"><b>Reorder level:</b> ${Number(x.low)||0}</div><div style="margin-top:8px"><b>Warehouse location:</b> ${escapeHtml(warehouseLocation(x))}</div>`;openModal('productViewModal')}
+function setProductLocation(id){const x=data.inventory.find(i=>i.id===id);if(!x)return;const price=prompt('Case price',Number(x.price)||0);if(price===null)return;const aisle=prompt('Aisle',x.aisle||'');if(aisle===null)return;const rack=prompt('Rack',x.rack||'');if(rack===null)return;const shelf=prompt('Shelf / Bin',x.shelf||'');if(shelf===null)return;const zone=prompt('Pallet Zone',x.zone||'');if(zone===null)return;x.price=Math.max(0,Number(price)||0);x.aisle=aisle.trim();x.rack=rack.trim();x.shelf=shelf.trim();x.zone=zone.trim();logActivity(x.name+' price/location updated');save()}
+function productSearchText(x){return [x.name,x.sku,x.barcode,x.aisle,x.rack,x.shelf,x.zone].filter(Boolean).join(' ').toLowerCase()}
+function renderInventory(){
+  const q=(document.getElementById('inventorySearch')?.value||'').trim().toLowerCase();
+  const rows=data.inventory.filter(x=>!q||productSearchText(x).includes(q));
+  const count=document.getElementById('inventorySearchCount');if(count)count.textContent=rows.length+' of '+data.inventory.length+' product'+(data.inventory.length===1?'':'s');
+  inventoryList.innerHTML=rows.map(x=>`<details class="store-pick-details"><summary><div class="row"><div><b>${escapeHtml(x.name)}</b><span class="muted small">${escapeHtml(x.sku)}</span></div><span class="pill">${x.qty} cases</span></div></summary><div class="store-pick-body"><div class="product-row" onclick="openProductView(${x.id})">${productPicture(x)}<div><b>${escapeHtml(x.name)}</b><div class="muted small">${escapeHtml(warehouseLocation(x))}</div><div class="muted small" style="margin-top:5px"><b>Case price:</b> ${money(Number(x.price)||0)}</div><div class="muted small" style="margin-top:7px">Tap product to view full details</div></div></div><div class="actions" style="margin-top:10px"><button class="btn" onclick="adjustStock(${x.id},1)">+ Case</button><button class="btn warn" onclick="adjustStock(${x.id},-1)">- Case</button></div><button class="btn" onclick="setProductLocation(${x.id})">Set Price & Warehouse Location</button></div></details>`).join('')||'<div class="item muted">No products match your search</div>'
+}
+function adjustStock(id,n){let x=data.inventory.find(i=>i.id===id);x.qty=Math.max(0,x.qty+n);logActivity(x.name+' stock changed to '+x.qty);save()}
+function renderPartners(){partnerList.innerHTML=data.partners.map(x=>`<details class="store-pick-details"><summary><div class="row"><div><b>${escapeHtml(x.name)}</b><span class="muted small">${escapeHtml(x.address||'No address saved')}</span></div><span class="pill">${money(x.balance)}</span></div></summary><div class="store-pick-body"><div class="row"><span>Balance</span><b>${money(x.balance)}</b></div><div class="actions" style="margin-top:10px"><button class="btn green" onclick="recordPayment(${x.id})">Record Payment</button><button class="btn" onclick="addPartnerOrder(${x.id})">Add Order</button></div></div></details>`).join('')||'<div class="item muted">No partners</div>'}
+function savePartner(){if(!partnerName.value)return alert('Enter business name');data.partners.push({id:Date.now(),name:partnerName.value,address:partnerAddress.value,balance:+partnerBalance.value||0});logActivity('Partner added: '+partnerName.value);closeModal('partnerModal');save()}
+function recordPayment(id){let x=data.partners.find(p=>p.id===id);let a=+prompt('Payment amount',x.balance)||0;x.balance=Math.max(0,x.balance-a);logActivity('Payment recorded for '+x.name+': '+money(a));save()}
+function addPartnerOrder(id){let x=data.partners.find(p=>p.id===id);let a=+prompt('Order total',0)||0;x.balance+=a;logActivity('Order added for '+x.name+': '+money(a));save()}
+function fillPartnerSelect(){routePartner.innerHTML=data.partners.map(p=>`<option value="${p.id}">${escapeHtml(p.name)}</option>`).join('')}
+function renderRouteOrderItems(){
+  renderRouteProductChoices();
+  routeOrderItems.querySelectorAll('.route-product-qty').forEach(i=>i.addEventListener('input',updateRouteCaseSummary));updateRouteCaseSummary();
+}
+function renderRouteProductChoices(){const box=routeOrderItems;if(!box)return;const q=(document.getElementById('routeProductSearch')?.value||'').trim().toLowerCase();const saved=new Map([...box.querySelectorAll('.route-product-qty')].map(i=>[Number(i.dataset.productId),Number(i.value)||0]));const rows=data.inventory.filter(x=>!q||productSearchText(x).includes(q));box.innerHTML=rows.map(x=>`<div class="item"><div class="product-row">${productPicture(x)}<div><b>${escapeHtml(x.name)}</b><div class="muted small">Available: ${x.qty} · ${escapeHtml(x.sku)}</div><label style="margin-top:8px">Cases for this store</label><input class="qty-input route-product-qty" type="number" min="0" max="${x.qty}" value="${saved.get(Number(x.id))||0}" data-product-id="${x.id}"></div></div></div>`).join('')||'<div class="item muted">No products match your search.</div>';box.querySelectorAll('.route-product-qty').forEach(i=>i.addEventListener('input',updateRouteCaseSummary));updateRouteCaseSummary()}
+function updateRouteCaseSummary(){const total=[...document.querySelectorAll('.route-product-qty')].reduce((a,i)=>a+(Number(i.value)||0),0);routeCaseSummary.textContent=total+' total case'+(total===1?'':'s')}
+function saveRoute(){
+  const items=[...document.querySelectorAll('.route-product-qty')].map(i=>({productId:Number(i.dataset.productId),qty:Math.max(0,Number(i.value)||0),picked:0,routePicked:0})).filter(i=>i.qty>0);
+  if(!routePartner.value)return alert('Choose a store');if(!items.length)return alert('Add at least one product to the store order');
+  const cases=items.reduce((a,b)=>a+b.qty,0);data.routes.push({id:Date.now(),partnerId:+routePartner.value,cases,items,amount:+routeAmount.value||0,status:'Pending',warehouseStatus:'Picking'});logActivity('Store order sent to warehouse');routeAmount.value='0';closeModal('routeModal');save()
+}
+function warehouseItemsHtml(r){if(!Array.isArray(r.items)||!r.items.length)return `<div class="muted small">General load: ${r.cases||0} cases</div>`;return r.items.map(item=>{const x=data.inventory.find(p=>p.id===item.productId)||{id:item.productId,name:'Unknown product',sku:'',image:''};const picked=Math.min(Number(item.qty)||0,Number(item.picked)||0);const remaining=Math.max(0,(Number(item.qty)||0)-picked);const done=remaining===0;return `<div class="item warehouse-pick-item ${done?'pick-done':''}" style="margin-top:10px"><div class="pick-product">${productPicture(x)}<div><b>${escapeHtml(x.name)}</b><div class="muted small">Barcode: ${escapeHtml(x.sku)}</div><div style="margin-top:5px;font-weight:800">Warehouse: ${done?item.qty+'/'+item.qty+' Picked':picked+'/'+item.qty+' picked · '+remaining+' remaining'}</div><div class="notice" style="margin-top:6px;padding:7px"><b>FROM:</b> ${escapeHtml(warehouseLocation(x))}</div></div><b>${picked}/${item.qty}</b></div><div class="actions" style="margin-top:10px"><button class="btn green warehouse-pick-all" type="button" data-route-id="${r.id}" data-product-id="${item.productId}" ${done?'disabled':''}>${done?'Warehouse Picked':'Warehouse Pick All '+remaining}</button><button class="btn warn warehouse-undo-all" type="button" data-route-id="${r.id}" data-product-id="${item.productId}" ${picked<=0?'disabled':''}>Undo Warehouse Pick</button></div><button class="btn warehouse-open-product" type="button" data-product-id="${item.productId}">Open Product</button></div>`}).join('')}
+function routeItemsHtml(r){if(!Array.isArray(r.items)||!r.items.length)return `<div class="muted small">General load: ${r.cases||0} cases</div>`;return r.items.map(item=>{const x=data.inventory.find(p=>p.id===item.productId)||{id:item.productId,name:'Unknown product',sku:'',image:''};const warehousePicked=Math.min(Number(item.qty)||0,Number(item.picked)||0);const routePicked=Math.min(Number(item.qty)||0,Number(item.routePicked)||0);const warehouseReady=warehousePicked>=Number(item.qty||0);const remaining=Math.max(0,(Number(item.qty)||0)-routePicked);const done=remaining===0;return `<div class="item ${done?'pick-done':''}" style="margin-top:10px"><div class="pick-product">${productPicture(x)}<div><b>${escapeHtml(x.name)}</b><div class="muted small">Barcode: ${escapeHtml(x.sku)}</div><div style="margin-top:5px;font-weight:800">Warehouse: ${warehousePicked}/${item.qty} · Route: ${routePicked}/${item.qty}</div><div class="notice" style="margin-top:6px;padding:7px"><b>PALLET:</b> ${warehouseReady?'Ready for route pickup':'Waiting on Warehouse'}</div></div><b>${done?'Picked':routePicked+'/'+item.qty}</b></div><div class="actions" style="margin-top:10px"><button class="btn green route-pick-all" type="button" data-route-id="${r.id}" data-product-id="${item.productId}" ${done||!warehouseReady?'disabled':''}>${done?'Route Picked '+item.qty+'/'+item.qty:warehouseReady?'Route Pick All '+remaining:'Waiting on Warehouse'}</button><button class="btn warn route-undo-all" type="button" data-route-id="${r.id}" data-product-id="${item.productId}" ${routePicked<=0?'disabled':''}>Undo Route Pick</button></div><button class="btn warehouse-open-product" type="button" data-product-id="${item.productId}">Open Product</button></div>`}).join('')}
+function renderRoutes(){routeList.innerHTML=data.routes.map(r=>{let p=data.partners.find(x=>x.id===r.partnerId)||{name:'Unknown',address:'No address saved'};return `<details class="store-pick-details route-store-card" data-route-id="${r.id}"><summary><div class="row"><div><b>${escapeHtml(p.name)}</b><span class="muted small">${r.cases} cases · ${money(r.amount)}</span></div><span class="pill">${r.status}</span></div></summary><div class="store-pick-body"><div class="notice small"><b>Address:</b> ${escapeHtml(p.address||'No address saved')}${p.address?`<a class="btn green" style="display:block;text-align:center;text-decoration:none;margin-top:8px" href="${navigationUrl(p.address)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">Navigate</a>`:''}</div><div style="margin-top:10px">${routeItemsHtml(r)}</div><button class="btn primary open-route-btn" type="button" data-route-id="${r.id}">Open Store Details</button>${r.status==='Pending'?`<button class="btn green complete-route-btn" type="button" data-route-id="${r.id}">Complete Delivery</button>`:`<button class="btn primary open-invoice-btn" type="button" data-route-id="${r.id}">View Invoices</button>`}</div></details>`}).join('')||'<div class="item muted">No route stops</div>'}
+function navigationUrl(address){const a=String(address||'').trim();return a?`https://maps.apple.com/?daddr=${encodeURIComponent(a)}&dirflg=d`:''}
+function openRouteDetails(id){activeRouteDetailId=id;const r=data.routes.find(x=>x.id===id);if(!r)return alert('Route stop not found.');const p=data.partners.find(x=>x.id===r.partnerId)||{name:'Unknown store',address:'No address saved',balance:0};const address=String(p.address||'').trim();const nav=address?navigationUrl(address):'';routeDetailsStore.textContent=p.name;routeDetailsAddress.innerHTML=`<b>Store Address</b><div style="margin-top:5px">${escapeHtml(address||'No address saved')}</div>${nav?`<a class="btn green" style="display:block;text-align:center;text-decoration:none;margin-top:10px" href="${nav}" target="_blank" rel="noopener">Navigate to Store</a>`:`<div class="muted small" style="margin-top:8px">Add a store address to use navigation.</div>`}`;const total=Array.isArray(r.items)?r.items.reduce((a,i)=>a+(Number(i.qty)||0),0):(r.cases||0);const warehousePicked=Array.isArray(r.items)?r.items.reduce((a,i)=>a+(Number(i.picked)||0),0):0;const routePicked=Array.isArray(r.items)?r.items.reduce((a,i)=>a+(Number(i.routePicked)||0),0):0;routeInfoPanel.innerHTML=`<h3>Store Information</h3><div class="item"><b>Store</b><div class="muted">${escapeHtml(p.name||'Unknown store')}</div></div><div class="item"><b>Address</b><div class="muted">${escapeHtml(address||'No address saved')}</div>${nav?`<a class="btn green" style="display:block;text-align:center;text-decoration:none;margin-top:8px" href="${nav}" target="_blank" rel="noopener">Navigate / Directions</a>`:''}</div><div class="item"><b>Contact</b><div class="muted">${escapeHtml(p.contact||p.phone||'No contact saved')}</div></div><div class="item"><b>Store Balance</b><div class="muted">${money(p.balance||0)}</div></div><h3 style="margin-top:16px">Current Stop</h3><div class="item"><b>Status</b><div class="muted">${escapeHtml(r.status||'Pending')}</div></div><div class="item"><b>Warehouse Status</b><div class="muted">${escapeHtml(r.warehouseStatus||'Not started')}</div></div><div class="item"><b>Warehouse Pick</b><div class="muted">${warehousePicked}/${total} picked</div></div><div class="item"><b>Route Pick</b><div class="muted">${routePicked}/${total} loaded</div></div><div class="item"><b>Amount to collect</b><div class="muted">${money(r.amount||0)}</div></div>`;routePickPanel.innerHTML=`<h3>Pick From Pallet</h3><div class="muted small" style="margin-bottom:10px">Warehouse picks first. Then Route must pick the full quantity from the pallet for loading.</div>${routeItemsHtml(r)}`;showRouteDetailTab('info');openModal('routeDetailsModal')}
+function showRouteDetailTab(tab){const pick=tab==='pick';routeInfoPanel.classList.toggle('hidden',pick);routePickPanel.classList.toggle('hidden',!pick);routeInfoTabBtn.classList.toggle('primary',!pick);routePickTabBtn.classList.toggle('primary',pick)}
+function resetSignature(){signatureHasInk=false;signatureConfirmed=false;if(signatureCtx){signatureCtx.clearRect(0,0,signaturePad.width,signaturePad.height);signatureCtx.fillStyle='#fff';signatureCtx.fillRect(0,0,signaturePad.width,signaturePad.height)}signatureStatus.classList.remove('hidden');signatureStatus.classList.add('danger');signatureStatus.textContent='Signature required'}
+function resizeSignaturePad(){const ratio=Math.max(window.devicePixelRatio||1,1);const rect=signaturePad.getBoundingClientRect();signaturePad.width=Math.max(1,Math.floor(rect.width*ratio));signaturePad.height=Math.max(1,Math.floor(180*ratio));signatureCtx=signaturePad.getContext('2d');signatureCtx.scale(ratio,ratio);signatureCtx.lineWidth=2.5;signatureCtx.lineCap='round';signatureCtx.strokeStyle='#111';signatureCtx.fillStyle='#fff';signatureCtx.fillRect(0,0,rect.width,180)}
+function signaturePoint(e){const rect=signaturePad.getBoundingClientRect();const t=e.touches?e.touches[0]:e;return{x:t.clientX-rect.left,y:t.clientY-rect.top}}
+function startSignature(e){e.preventDefault();signatureDrawing=true;signatureConfirmed=false;const p=signaturePoint(e);signatureCtx.beginPath();signatureCtx.moveTo(p.x,p.y)}
+function moveSignature(e){if(!signatureDrawing)return;e.preventDefault();const p=signaturePoint(e);signatureCtx.lineTo(p.x,p.y);signatureCtx.stroke();signatureHasInk=true;signatureStatus.classList.remove('danger');signatureStatus.textContent='Signature captured — tap Use Signature'}
+function endSignature(e){if(e)e.preventDefault();signatureDrawing=false}
+function initSignaturePad(){resizeSignaturePad();['mousedown','touchstart'].forEach(ev=>signaturePad.addEventListener(ev,startSignature,{passive:false}));['mousemove','touchmove'].forEach(ev=>signaturePad.addEventListener(ev,moveSignature,{passive:false}));['mouseup','mouseleave','touchend','touchcancel'].forEach(ev=>signaturePad.addEventListener(ev,endSignature,{passive:false}));clearSignatureBtn.addEventListener('click',resetSignature);confirmSignatureBtn.addEventListener('click',()=>{if(!signatureHasInk)return alert('Have the customer sign first.');signatureConfirmed=true;signatureStatus.classList.remove('danger');signatureStatus.textContent='Signature confirmed'});podPaymentMethod.addEventListener('change',()=>checkDetails.classList.toggle('hidden',podPaymentMethod.value!=='Check'))}
+function openPOD(id){podId.value=id;podReceiver.value='';podPayment.value='0';podPaymentMethod.value='Cash';podCheckNumber.value='';podPaymentReference.value='';podNotes.value='';podSignerName.value='';checkDetails.classList.add('hidden');openModal('podModal');setTimeout(()=>{resizeSignaturePad();resetSignature()},60)}
+async function completeStop(){const method=podPaymentMethod.value;const amount=+podPayment.value||0;let routeCheck=data.routes.find(x=>x.id==podId.value);if(routeCheck&&Array.isArray(routeCheck.items)&&routeCheck.items.some(i=>(Number(i.routePicked)||0)<(Number(i.qty)||0)))return alert('Route must pick every product from the pallet before completing delivery.');if(!podReceiver.value.trim())return alert('Enter the receiver name.');if(!podSignerName.value.trim())return alert('Enter the typed signer name above the signature.');if(method==='Check'&&!podCheckNumber.value.trim())return alert('Enter the check number.');if(!signatureHasInk||!signatureConfirmed)return alert('Customer signature is required. Have them sign and tap Use Signature.');let r=data.routes.find(x=>x.id==podId.value);if(!r)return alert('Route stop not found.');r.status='Completed';r.receiver=podReceiver.value.trim();r.signerName=podSignerName.value.trim();r.payment=amount;r.paymentMethod=method;r.checkNumber=method==='Check'?podCheckNumber.value.trim():'';r.paymentReference=podPaymentReference.value.trim();r.signature=signaturePad.toDataURL('image/png');r.signedAt=new Date().toISOString();r.invoiceNumber=r.invoiceNumber||('STB-'+new Date().toISOString().slice(0,10).replaceAll('-','')+'-'+String(r.id).padStart(4,'0'));r.notes=podNotes.value.trim();let p=data.partners.find(x=>x.id===r.partnerId);if(p)p.balance=Math.max(0,p.balance-r.payment);logActivity('Delivery completed for '+(p?p.name:'partner')+' — '+method+' '+money(amount));closeModal('podModal');await save();resetSignature();openInvoice(r.id,'Partner Copy')}
+function invoiceItems(r){if(Array.isArray(r.items)&&r.items.length)return r.items.map(i=>{const p=data.inventory.find(x=>x.id===i.productId)||{name:'Unknown product',sku:''};return {name:p.name,sku:p.sku,qty:i.qty||0}});return [{name:'General merchandise load',sku:'',qty:r.cases||0}]}
+function invoiceMarkup(r,copy){const p=data.partners.find(x=>x.id===r.partnerId)||{name:'Unknown Partner',address:'No address saved',balance:0};const date=r.signedAt?new Date(r.signedAt):new Date();const rows=invoiceItems(r).map(i=>`<tr><td>${escapeHtml(i.name)}<div class="muted small">${escapeHtml(i.sku||'')}</div></td><td class="right">${i.qty}</td></tr>`).join('');const check=r.paymentMethod==='Check'&&r.checkNumber?`<div><b>Check #:</b> ${escapeHtml(r.checkNumber)}</div>`:'';const ref=r.paymentReference?`<div><b>Reference:</b> ${escapeHtml(r.paymentReference)}</div>`:'';const sig=r.signature?`<img src="${r.signature}" alt="Signature" style="max-width:260px;max-height:100px;border-bottom:1px solid #222">`:'';return `<img src="stb-logo.jpg" class="invoice-brand" alt="STB Distribution"><div class="invoice-copy-label">${escapeHtml(copy)}</div><h2 style="margin:6px 0">STB Distribution</h2><div><b>Invoice:</b> ${escapeHtml(r.invoiceNumber||('STB-'+r.id))}</div><div><b>Date:</b> ${date.toLocaleString()}</div><hr><h3>Bill To</h3><div><b>${escapeHtml(p.name)}</b></div><div>${escapeHtml(p.address||'No address saved')}</div><table style="margin-top:14px"><thead><tr><th>Product</th><th class="right">Cases</th></tr></thead><tbody>${rows}</tbody></table><div style="margin-top:14px"><div><b>Invoice total:</b> ${money(r.amount)}</div><div><b>Payment collected:</b> ${money(r.payment)}</div><div><b>Payment method:</b> ${escapeHtml(r.paymentMethod||'Not recorded')}</div>${check}${ref}<div><b>Remaining partner balance:</b> ${money(p.balance)}</div></div><div style="margin-top:14px"><b>Received by:</b> ${escapeHtml(r.receiver||'')}</div><div><b>Typed signer name:</b> ${escapeHtml(r.signerName||r.receiver||'')}</div><div style="margin-top:8px">${sig}</div><div class="small">Signed ${date.toLocaleString()}</div>${r.notes?`<div style="margin-top:14px"><b>Delivery notes:</b> ${escapeHtml(r.notes)}</div>`:''}` }
+function openInvoice(routeId,copy='Partner Copy'){const r=data.routes.find(x=>x.id==routeId);if(!r)return alert('Invoice route not found.');activeInvoiceRouteId=r.id;invoicePreview.innerHTML=invoiceMarkup(r,copy);openModal('invoiceModal')}
+function printInvoice(copy){const r=data.routes.find(x=>x.id==activeInvoiceRouteId);if(!r)return alert('Invoice route not found.');invoicePreview.innerHTML=invoiceMarkup(r,copy);const w=window.open('','_blank');if(!w)return alert('Allow pop-ups to print the invoice.');w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>${copy} - ${r.invoiceNumber||'Invoice'}</title><style>body{font-family:Arial,sans-serif;color:#111;padding:28px;max-width:760px;margin:auto}table{width:100%;border-collapse:collapse}th,td{border-bottom:1px solid #ddd;padding:8px;text-align:left}.right{text-align:right}.muted{color:#666}.small{font-size:12px}.invoice-copy-label{font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:#555}.invoice-brand{width:190px;max-height:120px;object-fit:contain;display:block;margin-bottom:10px}</style></head><body>${invoiceMarkup(r,copy)}<script>window.onload=()=>window.print()<\/script></body></html>`);w.document.close()}
+
+function normalizeBarcode(value){
+  const raw=String(value||'').trim().toLowerCase().replace(/[^a-z0-9]/g,'');
+  const numeric=raw.replace(/^0+(?=\d)/,'');
+  return {raw,numeric};
+}
+function findProductByBarcode(code){
+  const target=normalizeBarcode(code);
+  return data.inventory.find(item=>{
+    const sku=normalizeBarcode(item.sku);
+    return sku.raw===target.raw || (sku.numeric&&target.numeric&&sku.numeric===target.numeric);
+  });
+}
+async function scanCase(codeOverride){
+  const code=String(codeOverride||scanCode.value||'').trim();
+  scanResult.classList.remove('hidden','danger');
+  if(!code){scanResult.textContent='Enter or scan a SKU/barcode first.';scanResult.classList.add('danger');scanCode.focus();return}
+  const product=findProductByBarcode(code);
+  if(!product){scanResult.textContent='No product matches barcode '+code+'. Add the product first.';scanResult.classList.add('danger');return}
+  const pending=data.routes.filter(r=>r.status==='Pending'&&Array.isArray(r.items)).flatMap(r=>r.items.map(item=>({route:r,item}))).find(x=>x.item.productId===product.id&&(x.item.picked||0)<x.item.qty);
+  if(!pending){scanResult.innerHTML=`${productPicture(product)}<div style="margin-top:8px"><b>${escapeHtml(product.name)}</b><div>No pending store order still needs this product.</div></div>`;scanResult.classList.add('danger');return}
+  if(Number(product.qty||0)<=0){scanResult.innerHTML=`${productPicture(product)}<div style="margin-top:8px"><b>${escapeHtml(product.name)}</b><div>Inventory is at zero.</div></div>`;scanResult.classList.add('danger');return}
+  pending.item.picked=(pending.item.picked||0)+1;product.qty=Math.max(0,Number(product.qty||0)-1);
+  const store=data.partners.find(p=>p.id===pending.route.partnerId)||{name:'Unknown store'};
+  if(pending.route.items.every(i=>(i.picked||0)>=i.qty))pending.route.warehouseStatus='Ready';
+  scanCode.value='';scanResult.innerHTML=`<div class="product-row">${productPicture(product)}<div><b>${escapeHtml(product.name)}</b><div>Picked for ${escapeHtml(store.name)}</div><div class="muted small">Store progress: ${pending.item.picked}/${pending.item.qty} · Stock left: ${product.qty}</div></div></div>`;
+  logActivity('Warehouse picked '+product.name+' for '+store.name);await save();scanCode.focus();
+}
+async function useCameraScanner(target='warehouse'){
+  scanResult.classList.remove('hidden','danger');
+  if(typeof Html5Qrcode==='undefined'){
+    scanResult.textContent='Scanner library did not load. Refresh the page, then try again.';
+    scanResult.classList.add('danger');
+    return;
+  }
+  const overlay=document.createElement('div');
+  overlay.className='modal open';
+  overlay.style.display='flex';
+  overlay.innerHTML='<div class="sheet"><div class="sheethead"><h3>'+ (target==='product'?'Scan New Product Barcode':'Scan Product Barcode') +'</h3><button class="btn close" type="button">Close</button></div><p class="muted">Allow camera access, then hold the barcode inside the square.</p><div id="warehouseQrReader" style="width:100%;overflow:hidden;border-radius:14px"></div><div id="warehouseCameraMessage" class="notice hidden"></div></div>';
+  document.body.appendChild(overlay);
+  document.body.style.overflow='hidden';
+  const readerId='warehouseQrReader';
+  const scanner=new Html5Qrcode(readerId,{verbose:false});
+  let closed=false;
+  const closeScanner=async()=>{
+    if(closed)return;closed=true;
+    try{if(scanner.isScanning)await scanner.stop()}catch(e){}
+    try{await scanner.clear()}catch(e){}
+    overlay.remove();document.body.style.overflow='';
+  };
+  overlay.querySelector('button').addEventListener('click',closeScanner);
+  overlay.addEventListener('click',e=>{if(e.target===overlay)closeScanner()});
+  try{
+    await scanner.start(
+      {facingMode:'environment'},
+      {fps:12,qrbox:{width:280,height:160},aspectRatio:1.5,disableFlip:true},
+      async decodedText=>{
+        await closeScanner();
+        if(target==='product'){
+          pSku.value=decodedText;
+          productResult.classList.remove('hidden','danger');
+          productResult.textContent='Barcode captured: '+decodedText;
+          pSku.focus();
+        }else{
+          scanCode.value=decodedText;
+          await scanCase(decodedText);
+        }
+      },
+      ()=>{}
+    );
+  }catch(e){
+    const msg=overlay.querySelector('#warehouseCameraMessage');
+    msg.classList.remove('hidden');
+    msg.textContent='Camera could not start. In Safari Settings, allow camera access for this website, then refresh and try again.';
+  }
+}
+function renderLoad(){
+  const q=(document.getElementById('warehouseProductSearch')?.value||'').trim().toLowerCase();
+  const pending=data.routes.filter(r=>r.status==='Pending').filter(r=>{if(!q)return true;const partner=data.partners.find(p=>p.id===r.partnerId)||{};return [partner.name,partner.address].filter(Boolean).join(' ').toLowerCase().includes(q)||(r.items||[]).some(i=>{const p=data.inventory.find(x=>x.id===i.productId)||{};return productSearchText(p).includes(q)})});
+  loadList.innerHTML=pending.map(r=>{const p=data.partners.find(x=>x.id===r.partnerId)||{name:'Unknown'};const total=Array.isArray(r.items)?r.items.reduce((a,i)=>a+i.qty,0):r.cases||0;const picked=Array.isArray(r.items)?r.items.reduce((a,i)=>a+(i.picked||0),0):0;const ready=Array.isArray(r.items)&&r.items.length&&r.items.every(i=>(i.picked||0)>=i.qty);return `<details class="store-pick-details"><summary><div class="row"><div><b>${escapeHtml(p.name)}</b><span class="muted small">${picked}/${total} cases picked</span><div class="store-toggle-label">Tap to open store pick list</div></div><span class="pill">${ready?'Ready':'Picking'}</span></div></summary><div class="store-pick-body"><div class="notice small"><b>Store:</b> ${escapeHtml(p.name)}<br><b>Address:</b> ${escapeHtml(p.address||'No address saved')}</div><div style="margin-top:10px">${warehouseItemsHtml(r)}</div></div></details>`}).join('')||'<div class="item muted">No pending store orders</div>'
+}
+
+async function pickWarehouseAll(routeId,productId){
+  const route=data.routes.find(r=>r.id===routeId);const item=route&&Array.isArray(route.items)?route.items.find(i=>i.productId===productId):null;const product=data.inventory.find(p=>p.id===productId);
+  if(!route||!item||!product)return alert('This pick-list item could not be found.');
+  const remaining=Math.max(0,(Number(item.qty)||0)-(Number(item.picked)||0));
+  if(remaining<=0)return;
+  if(Number(product.qty||0)<remaining)return alert(product.name+' only has '+Number(product.qty||0)+' case'+(Number(product.qty||0)===1?'':'s')+' in stock. You need '+remaining+'.');
+  item.picked=(Number(item.picked)||0)+remaining;product.qty=Math.max(0,Number(product.qty||0)-remaining);
+  route.warehouseStatus=route.items.every(i=>(Number(i.picked)||0)>=(Number(i.qty)||0))?'Ready':'Picking';
+  logActivity('Picked all '+remaining+' remaining case'+(remaining===1?'':'s')+' of '+product.name);await save();
+  if(activeRouteDetailId===routeId)openRouteDetails(routeId);
+}
+async function undoWarehouseAll(routeId,productId){
+  const route=data.routes.find(r=>r.id===routeId);const item=route&&Array.isArray(route.items)?route.items.find(i=>i.productId===productId):null;const product=data.inventory.find(p=>p.id===productId);
+  if(!route||!item||!product)return alert('This pick-list item could not be found.');
+  const picked=Math.max(0,Number(item.picked)||0);if(picked<=0)return;
+  if((Number(item.routePicked)||0)>0)return alert('Route already picked this product from the pallet. Undo the Route pick first.');
+  item.picked=0;product.qty=Number(product.qty||0)+picked;route.warehouseStatus='Picking';
+  logActivity('Undid pick of '+picked+' case'+(picked===1?'':'s')+' of '+product.name);await save();
+  if(activeRouteDetailId===routeId)openRouteDetails(routeId);
+}
+async function pickRouteAll(routeId,productId){
+  const route=data.routes.find(r=>r.id===routeId);const item=route&&Array.isArray(route.items)?route.items.find(i=>i.productId===productId):null;const product=data.inventory.find(p=>p.id===productId);
+  if(!route||!item||!product)return alert('This route pick item could not be found.');
+  const qty=Math.max(0,Number(item.qty)||0),warehousePicked=Math.max(0,Number(item.picked)||0),routePicked=Math.max(0,Number(item.routePicked)||0);
+  if(warehousePicked<qty)return alert('Warehouse must finish picking all '+qty+' case'+(qty===1?'':'s')+' before Route can load this product.');
+  const remaining=Math.max(0,qty-routePicked);if(remaining<=0)return;
+  item.routePicked=qty;
+  logActivity('Route picked '+qty+' case'+(qty===1?'':'s')+' of '+product.name+' from pallet');await save();
+  if(activeRouteDetailId===routeId)openRouteDetails(routeId);
+}
+async function undoRouteAll(routeId,productId){
+  const route=data.routes.find(r=>r.id===routeId);const item=route&&Array.isArray(route.items)?route.items.find(i=>i.productId===productId):null;const product=data.inventory.find(p=>p.id===productId);
+  if(!route||!item||!product)return alert('This route pick item could not be found.');
+  const picked=Math.max(0,Number(item.routePicked)||0);if(picked<=0)return;
+  item.routePicked=0;logActivity('Route undid pallet pick of '+picked+' case'+(picked===1?'':'s')+' of '+product.name);await save();
+  if(activeRouteDetailId===routeId)openRouteDetails(routeId);
+}
+function handlePickListClick(event){
+  const openRoute=event.target.closest('.open-route-btn');if(openRoute){event.preventDefault();event.stopPropagation();openRouteDetails(Number(openRoute.dataset.routeId));return;}
+  const completeRoute=event.target.closest('.complete-route-btn');if(completeRoute){event.preventDefault();event.stopPropagation();openPOD(Number(completeRoute.dataset.routeId));return;}
+  const invoice=event.target.closest('.open-invoice-btn');if(invoice){event.preventDefault();event.stopPropagation();openInvoice(Number(invoice.dataset.routeId),'Partner Copy');return;}
+  const routePick=event.target.closest('.route-pick-all');if(routePick){event.preventDefault();event.stopPropagation();pickRouteAll(Number(routePick.dataset.routeId),Number(routePick.dataset.productId));return;}
+  const routeUndo=event.target.closest('.route-undo-all');if(routeUndo){event.preventDefault();event.stopPropagation();undoRouteAll(Number(routeUndo.dataset.routeId),Number(routeUndo.dataset.productId));return;}
+  const pick=event.target.closest('.warehouse-pick-all');if(pick){event.preventDefault();event.stopPropagation();pickWarehouseAll(Number(pick.dataset.routeId),Number(pick.dataset.productId));return;}
+  const undo=event.target.closest('.warehouse-undo-all');if(undo){event.preventDefault();event.stopPropagation();undoWarehouseAll(Number(undo.dataset.routeId),Number(undo.dataset.productId));return;}
+  const open=event.target.closest('.warehouse-open-product');if(open){event.preventDefault();event.stopPropagation();openProductView(Number(open.dataset.productId));return;}
+}
+loadList.addEventListener('click',handlePickListClick);
+routeList.addEventListener('click',handlePickListClick);
+routePickPanel.addEventListener('click',handlePickListClick);
+
+function completeLoad(){const notReady=data.routes.filter(r=>r.status==='Pending'&&Array.isArray(r.items)&&r.items.some(i=>(i.picked||0)<i.qty));if(notReady.length)return alert(notReady.length+' store order(s) are not fully picked yet.');data.routes.filter(r=>r.status==='Pending').forEach(r=>r.warehouseStatus='Ready');logActivity('All warehouse orders marked ready for route');save();alert('All pending store orders are ready for the Route Specialist.')}
+function calculateProspectOrderTotal(){
+  let total=0,cases=0;
+  document.querySelectorAll('.sales-product-qty').forEach(input=>{
+    const qty=Math.max(0,Number(input.value)||0),price=Math.max(0,Number(input.dataset.price)||0);
+    cases+=qty;total+=qty*price;
+    const line=document.getElementById('sales-line-total-'+input.dataset.productId);if(line)line.textContent=money(qty*price);
+  });
+  const summary=document.getElementById('salesCaseSummary');if(summary)summary.innerHTML=`<b>${cases} total case${cases===1?'':'s'}</b><div style="margin-top:5px">Calculated order total: <b>${money(total)}</b></div>`;
+  const amount=document.getElementById('sAmount');if(amount)amount.value=total.toFixed(2);
+  return total;
+}
+function renderSalesOrderItems(existingItems=[]){
+  const box=document.getElementById('salesOrderItems');if(!box)return;
+  const saved=new Map([...box.querySelectorAll('.sales-product-qty')].map(i=>[Number(i.dataset.productId),Number(i.value)||0]));
+  (existingItems||[]).forEach(i=>{if(!saved.has(Number(i.productId)))saved.set(Number(i.productId),Number(i.qty)||0)});
+  const q=(document.getElementById('salesProductSearch')?.value||'').trim().toLowerCase();const rows=data.inventory.filter(x=>!q||productSearchText(x).includes(q));
+  box.innerHTML=rows.map(x=>{const price=Math.max(0,Number(x.price)||0),qty=saved.get(Number(x.id))||0;return `<div class="item"><div class="product-row">${productPicture(x)}<div><b>${escapeHtml(x.name)}</b><div class="muted small">Available: ${Number(x.qty)||0} · ${escapeHtml(x.sku||'')}</div><div class="muted small" style="margin-top:4px"><b>${money(price)} per case</b></div><label style="margin-top:8px">Cases requested</label><input class="qty-input sales-product-qty" type="number" min="0" max="${Number(x.qty)||0}" value="${qty}" data-product-id="${x.id}" data-price="${price}"><div class="row" style="margin-top:7px"><span class="muted small">Line total</span><b id="sales-line-total-${x.id}">${money(qty*price)}</b></div></div></div></div>`}).join('')||'<div class="item muted">No products match your search.</div>';
+  box.querySelectorAll('.sales-product-qty').forEach(i=>i.addEventListener('input',calculateProspectOrderTotal));calculateProspectOrderTotal();
+}
+function prospectItemsFromForm(){return [...document.querySelectorAll('.sales-product-qty')].map(i=>({productId:Number(i.dataset.productId),qty:Math.max(0,Number(i.value)||0)})).filter(i=>i.qty>0)}
+function openProspectDetails(id){const x=data.sales.find(s=>s.id===id);if(!x)return alert('Prospect not found.');prospectDetailsTitle.textContent=x.name||'Prospect Details';const items=(x.items||[]).map(i=>{const p=data.inventory.find(q=>q.id===i.productId)||{name:'Unknown product',sku:''};const price=Number(p.price)||0;return `<div class="item"><div class="row"><div><b>${escapeHtml(p.name)}</b><span class="muted small">${escapeHtml(p.sku||'')} · ${money(price)} each</span></div><div style="text-align:right"><b>${Number(i.qty)||0} cases</b><div class="muted small">${money((Number(i.qty)||0)*price)}</div></div></div></div>`}).join('')||'<div class="muted">No first order entered yet.</div>';prospectDetailsBody.innerHTML=`<div><b>Business:</b> ${escapeHtml(x.name||'')}</div><div style="margin-top:10px"><b>Address:</b> ${escapeHtml(x.address||'Not entered')}</div><div style="margin-top:10px"><b>Contact:</b> ${escapeHtml(x.contact||'Not entered')}</div><div><b>Phone:</b> ${escapeHtml(x.phone||'Not entered')}</div><div><b>Email:</b> ${escapeHtml(x.email||'Not entered')}</div><div style="margin-top:10px"><b>Status:</b> ${escapeHtml(x.status||'New')}</div><div style="margin-top:10px"><b>Notes:</b> ${escapeHtml(x.notes||'No notes saved')}</div><div style="margin-top:12px"><b>Proposed first order:</b></div>${items}<div class="notice"><b>Order total:</b> ${money(x.amount||0)}</div>${x.convertedPartnerId?'<div class="notice"><b>Converted:</b> Partner and warehouse order are linked to this prospect. Editing this prospect updates both.</div>':''}<button class="btn primary" onclick="editProspect(${x.id})">Edit Prospect & Order</button>${x.convertedPartnerId?'':`<button class="btn green" onclick="markProspectWon(${x.id})">Mark Won — Create Partner & Send Order</button><button class="btn" onclick="advanceProspect(${x.id})">Advance Status</button>`}`;openModal('prospectDetailsModal')}
+function renderSales(){const activeProspects=data.sales.filter(x=>!x.convertedPartnerId);salesList.innerHTML=activeProspects.map(x=>`<details class="store-pick-details"><summary><div class="row"><div><b>${escapeHtml(x.name)}</b><span class="muted small">${escapeHtml(x.contact||'No contact')} · ${escapeHtml(x.phone||'No phone')}</span></div><span class="pill">${escapeHtml(x.status||'New')}</span></div></summary><div class="store-pick-body"><div class="small muted">${escapeHtml(x.address||'No address entered')}</div><button class="btn primary" onclick="openProspectDetails(${x.id})">Open Prospect Details</button><button class="btn" onclick="editProspect(${x.id})">Edit Prospect & Order</button><button class="btn green" onclick="markProspectWon(${x.id})">Mark Won & Send to Warehouse</button></div></details>`).join('')||'<div class="item muted">No active sales prospects</div>'}
+function clearProspectForm(){['sName','sAddress','sContact','sPhone','sEmail','sNotes'].forEach(id=>{const e=document.getElementById(id);if(e)e.value=''});document.getElementById('sStatus').value='New';document.getElementById('sAmount').value='0';renderSalesOrderItems()}
+function openNewProspectForm(){editingProspectId=null;const ps=document.getElementById('salesProductSearch');if(ps)ps.value='';clearProspectForm();const t=document.getElementById('salesModalTitle'),b=document.getElementById('saveProspectBtn');if(t)t.textContent='Add Prospect';if(b)b.textContent='Save Prospect';openModal('salesModal')}
+function editProspect(id){const x=data.sales.find(s=>s.id===id);if(!x)return alert('Prospect not found.');editingProspectId=id;document.getElementById('sName').value=x.name||'';document.getElementById('sAddress').value=x.address||'';document.getElementById('sContact').value=x.contact||'';document.getElementById('sPhone').value=x.phone||'';document.getElementById('sEmail').value=x.email||'';document.getElementById('sNotes').value=x.notes||'';document.getElementById('sStatus').value=x.status||'New';document.getElementById('sAmount').value=Number(x.amount)||0;renderSalesOrderItems(x.items||[]);const t=document.getElementById('salesModalTitle'),b=document.getElementById('saveProspectBtn');if(t)t.textContent='Edit Prospect & Order';if(b)b.textContent='Save Changes';closeModal('prospectDetailsModal');openModal('salesModal')}
+function syncConvertedProspect(x){if(!x.convertedPartnerId)return;let partner=data.partners.find(p=>p.id===x.convertedPartnerId);if(!partner){partner={id:x.convertedPartnerId||Date.now(),sourceProspectId:x.id};data.partners.push(partner)}partner.name=x.name;partner.address=x.address;partner.contact=x.contact||'';partner.phone=x.phone||'';partner.email=x.email||'';let route=data.routes.find(r=>r.id===x.warehouseRouteId)||data.routes.find(r=>r.sourceProspectId===x.id);if(!route){route={id:Date.now()+1,partnerId:partner.id,status:'Pending',warehouseStatus:'Picking',createdAt:new Date().toISOString(),sourceProspectId:x.id};data.routes.push(route);x.warehouseRouteId=route.id}const old=new Map((route.items||[]).map(i=>[Number(i.productId),Number(i.picked)||0]));route.partnerId=partner.id;route.items=(x.items||[]).map(i=>({productId:Number(i.productId),qty:Number(i.qty)||0,picked:Math.min(Number(i.qty)||0,old.get(Number(i.productId))||0),routePicked:Math.min(Number(i.qty)||0,Number((route.items||[]).find(z=>Number(z.productId)===Number(i.productId))?.routePicked)||0)}));route.cases=route.items.reduce((a,i)=>a+i.qty,0);route.amount=Number(x.amount)||0;if(route.status!=='Completed'){route.status='Pending';route.warehouseStatus=route.items.length&&route.items.every(i=>(i.picked||0)>=i.qty)?'Ready':'Picking';partner.balance=Number(x.amount)||0}}
+function saveProspect(){const name=document.getElementById('sName').value.trim(),address=document.getElementById('sAddress').value.trim(),contact=document.getElementById('sContact').value.trim(),phone=document.getElementById('sPhone').value.trim(),email=document.getElementById('sEmail').value.trim(),notes=document.getElementById('sNotes').value.trim(),status=document.getElementById('sStatus').value,amount=Number(document.getElementById('sAmount').value)||0,items=prospectItemsFromForm();if(!name)return alert('Enter the business name');if(!address)return alert('Enter the store address');if(status==='Won'&&!items.length)return alert('Add at least one product before marking the prospect won');if(editingProspectId){const x=data.sales.find(s=>s.id===editingProspectId);if(!x)return alert('Prospect not found.');Object.assign(x,{name,address,contact,phone,email,notes,status,amount,items,updatedAt:new Date().toISOString()});syncConvertedProspect(x);const id=x.id,shouldConvert=status==='Won'&&!x.convertedPartnerId;logActivity('Prospect updated: '+name);editingProspectId=null;closeModal('salesModal');clearProspectForm();if(shouldConvert)convertProspectToPartner(id);else save();return}const x={id:Date.now(),name,address,contact,phone,email,notes,status,amount,items,createdAt:new Date().toISOString()};data.sales.push(x);logActivity('Prospect added: '+name);closeModal('salesModal');clearProspectForm();if(status==='Won')convertProspectToPartner(x.id);else save()}
+function convertProspectToPartner(id){const x=data.sales.find(s=>s.id===id);if(!x)return;if(x.convertedPartnerId){syncConvertedProspect(x);save();return alert('Partner and warehouse order updated.')}if(!Array.isArray(x.items)||!x.items.length)return alert('Open this prospect and add products before sending it to Warehouse.');let partner=data.partners.find(p=>String(p.name).toLowerCase()===String(x.name).toLowerCase()&&String(p.address||'').toLowerCase()===String(x.address||'').toLowerCase());if(!partner){partner={id:Date.now(),name:x.name,address:x.address,balance:Number(x.amount)||0,contact:x.contact||'',phone:x.phone||'',email:x.email||'',sourceProspectId:x.id};data.partners.push(partner)}const route={id:Date.now()+1,partnerId:partner.id,cases:x.items.reduce((a,i)=>a+(Number(i.qty)||0),0),items:x.items.map(i=>({productId:Number(i.productId),qty:Number(i.qty)||0,picked:0,routePicked:0})),amount:Number(x.amount)||0,status:'Pending',warehouseStatus:'Picking',createdAt:new Date().toISOString(),sourceProspectId:x.id};data.routes.push(route);x.status='Won';x.convertedPartnerId=partner.id;x.warehouseRouteId=route.id;x.wonAt=new Date().toISOString();logActivity(x.name+' won — added to Partners and order sent to Warehouse');closeModal('prospectDetailsModal');save();alert(x.name+' is now a Partner and the first order was sent to Warehouse.')}
+function markProspectWon(id){const x=data.sales.find(s=>s.id===id);if(!x)return;convertProspectToPartner(id)}
+function advanceProspect(id){let x=data.sales.find(s=>s.id===id);if(!x)return;let stages=['New','Follow-up','Quoted','Won'];const next=stages[Math.min(stages.length-1,Math.max(0,stages.indexOf(x.status))+1)];if(next==='Won'){convertProspectToPartner(id);return}x.status=next;logActivity(x.name+' moved to '+x.status);save()}
+function employeeTeam(x){const raw=String(x.team||x.role||'Other');if(raw==='Manager'||raw==='Owner'||raw==='Management')return 'Management';if(raw==='Warehouse')return 'Warehouse';if(raw==='Route Specialist'||raw==='Route'||raw==='Routes')return 'Routes';if(raw==='Sales')return 'Sales';return raw||'Other'}
+function renderEmployees(){const order=['Management','Warehouse','Routes','Sales','Other'];const groups={};(data.employees||[]).forEach(x=>{const team=employeeTeam(x);(groups[team]||(groups[team]=[])).push(x)});const keys=[...order.filter(k=>groups[k]?.length),...Object.keys(groups).filter(k=>!order.includes(k))];employeeList.innerHTML=keys.map(team=>`<details class="store-pick-details"><summary><div class="row"><div><b>${escapeHtml(team)} Team</b><span class="muted small">${groups[team].length} employee${groups[team].length===1?'':'s'}</span></div><span class="pill">Open</span></div></summary><div class="store-pick-body">${groups[team].map(x=>`<details class="store-pick-details" style="margin-top:10px"><summary><div class="row"><div><b>${escapeHtml(x.name)}</b><span class="muted small">${escapeHtml(x.title||x.role||team)}${x.email?' • '+escapeHtml(x.email):''}</span></div><span class="pill">${x.active?'Active':'Disabled'}</span></div></summary><div class="store-pick-body"><div class="item small"><b>Team:</b> ${escapeHtml(team)}<div><b>Job title:</b> ${escapeHtml(x.title||x.role||team)}</div><div class="muted">${x.email?escapeHtml(x.email):'No work email added'}</div></div><button class="btn ${x.active?'warn':'green'}" onclick="toggleEmployee(${x.id})">${x.active?'Disable':'Enable'}</button></div></details>`).join('')}</div></details>`).join('')||'<div class="item muted">No employees</div>'}
+function renderTeamDirectory(){if(!teamDirectory)return;const team=(Array.isArray(data.employees)?data.employees:[]).filter(x=>x.active!==false);teamDirectory.innerHTML=team.map(x=>`<div class="item"><div class="row"><div><b>${escapeHtml(x.name)}</b><span class="muted small">${escapeHtml(x.role)}${x.email?' • '+escapeHtml(x.email):''}</span></div><span class="pill">Active</span></div></div>`).join('')||'<div class="item muted">No active team members</div>';populateDirectRecipients()}
+function saveEmployee(){const name=eName.value.trim(),email=(eEmail?.value||'').trim().toLowerCase(),team=eRole.value,title=(eTitle?.value||'').trim()||team;if(!name)return alert('Enter employee name');if(email&&!/^\S+@\S+\.\S+$/.test(email))return alert('Enter a valid work email');if(email&&data.employees.some(x=>String(x.email||'').toLowerCase()===email))return alert('That employee email is already on the team');data.employees.push({id:Date.now(),name,team,role:team,title,email,active:true});logActivity(name+' added under '+team+' team');eName.value='';if(eEmail)eEmail.value='';if(eTitle)eTitle.value='';closeModal('employeeModal');save()}
+function toggleEmployee(id){let x=data.employees.find(e=>e.id===id);x.active=!x.active;logActivity(x.name+' '+(x.active?'enabled':'disabled'));save()}
+function routeDate(r){const raw=r.signedAt||r.completedAt||r.date||r.createdAt;const d=raw?new Date(raw):null;return d&& !Number.isNaN(d.getTime())?d:null}
+function periodStart(type){const now=new Date();if(type==='today')return new Date(now.getFullYear(),now.getMonth(),now.getDate());if(type==='week'){const d=new Date(now.getFullYear(),now.getMonth(),now.getDate());d.setDate(d.getDate()-d.getDay());return d}if(type==='month')return new Date(now.getFullYear(),now.getMonth(),1);return new Date(now.getFullYear(),0,1)}
+function completedIn(period){const start=periodStart(period);return data.routes.filter(r=>r.status==='Completed'&&(!routeDate(r)||routeDate(r)>=start))}
+function salesPeriodCard(label,period){const rows=completedIn(period);const total=rows.reduce((a,r)=>a+(Number(r.amount)||0),0);return `<details class="store-pick-details"><summary><div class="row"><b>${label}</b><strong>${money(total)}</strong></div></summary><div class="store-pick-body">${rows.map(r=>{const p=data.partners.find(x=>x.id===r.partnerId)||{name:'Unknown Store'};return `<div class="item"><div class="row"><b>${escapeHtml(p.name)}</b><span>${money(r.amount||0)}</span></div><div class="small muted">${routeDate(r)?routeDate(r).toLocaleString():'Date not recorded'}</div></div>`}).join('')||'<div class="muted">No completed sales in this period.</div>'}</div></details>`}
+function openDashboardDetail(type){if(type==='sales'){dashboardDetailsTitle.textContent='Sales Breakdown';dashboardDetailsBody.innerHTML=salesPeriodCard('Today','today')+salesPeriodCard('This Week','week')+salesPeriodCard('This Month','month')+salesPeriodCard('This Year','year')}else if(type==='collections'){dashboardDetailsTitle.textContent='Collections Breakdown';const rows=data.routes.filter(r=>Number(r.payment)>0);const methods={};rows.forEach(r=>{const m=r.paymentMethod||'Not recorded';methods[m]=(methods[m]||0)+(Number(r.payment)||0)});dashboardDetailsBody.innerHTML=`<div class="grid">${Object.entries(methods).map(([m,v])=>`<div class="metric"><span>${escapeHtml(m)}</span><strong>${money(v)}</strong></div>`).join('')||'<div class="muted">No payments collected.</div>'}</div><div class="card">${rows.map(r=>{const p=data.partners.find(x=>x.id===r.partnerId)||{name:'Unknown Store'};return `<div class="item"><div class="row"><b>${escapeHtml(p.name)}</b><span>${money(r.payment)}</span></div><div class="small muted">${escapeHtml(r.paymentMethod||'Not recorded')} • ${routeDate(r)?routeDate(r).toLocaleString():'Date not recorded'}</div></div>`}).join('')}</div>`}else if(type==='partners'){dashboardDetailsTitle.textContent='Partners / Stores';dashboardDetailsBody.innerHTML=data.partners.map(p=>`<details class="store-pick-details"><summary><div class="row"><b>${escapeHtml(p.name)}</b><span class="pill">${money(p.balance||0)}</span></div></summary><div class="store-pick-body"><div><b>Address:</b> ${escapeHtml(p.address||'No address saved')}</div><div style="margin-top:8px"><b>Balance:</b> ${money(p.balance||0)}</div></div></details>`).join('')||'<div class="item muted">No partners saved.</div>'}else{dashboardDetailsTitle.textContent='Low Stock Products';const rows=data.inventory.filter(i=>Number(i.qty)<=Number(i.low));dashboardDetailsBody.innerHTML=rows.map(i=>`<details class="store-pick-details"><summary><div class="row"><b>${escapeHtml(i.name)}</b><span class="pill">${Number(i.qty)||0} left</span></div></summary><div class="store-pick-body"><div><b>SKU:</b> ${escapeHtml(i.sku||'')}</div><div><b>Reorder level:</b> ${Number(i.low)||0}</div><div><b>Location:</b> ${escapeHtml([i.aisle,i.rack,i.shelf,i.zone].filter(Boolean).join(' / ')||'Not set')}</div><button class="btn" onclick="viewProduct(${i.id})">Open Product</button></div></details>`).join('')||'<div class="item muted">No low-stock products.</div>'}openModal('dashboardDetailsModal')}
+function renderDashboard(){const today=completedIn('today');salesMetric.textContent=money(today.reduce((a,b)=>a+(Number(b.amount)||0),0));collectionsMetric.textContent=money(data.routes.reduce((a,b)=>a+(Number(b.payment)||0),0));partnersMetric.textContent=data.partners.length;lowMetric.textContent=data.inventory.filter(i=>Number(i.qty)<=Number(i.low)).length;activityList.innerHTML=data.activity.map(a=>`<div class="item small">${escapeHtml(a)}</div>`).join('')||'<div class="item muted">No recent activity</div>'}
+
+function currentUserLabel(){return authSession?.user?.email||currentRole||'Unknown user'}
+function addInventoryHistory(productId,change,reason,ref=''){
+ const p=data.inventory.find(x=>x.id==productId);data.inventoryHistory.unshift({id:Date.now()+Math.random(),productId,productName:p?.name||'Unknown',sku:p?.sku||'',change:Number(change||0),after:Number(p?.qty||0),reason,user:currentUserLabel(),ref,createdAt:new Date().toISOString()});data.inventoryHistory=data.inventoryHistory.slice(0,1000)
+}
+function csvEscape(v){return '"'+String(v??'').replaceAll('"','""')+'"'}
+function downloadText(name,content,type='text/plain'){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([content],{type}));a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1000)}
+function openOpsPanel(type){normalizeBusinessData();opsTitle.textContent={vendors:'Vendors & Purchase Orders',returns:'Returns & Damaged Products',pricing:'Discounts, Taxes & Fees',history:'Inventory History',alerts:'Low-Stock Alerts',schedule:'Route Scheduling',orders:'Store Order History',permissions:'Employee Permissions',exports:'Backup & Export',profit:'Product Cost & Profit'}[type]||'Business Controls';
+ const productOptions=data.inventory.map(p=>`<option value="${p.id}">${escapeHtml(p.name)} (${escapeHtml(p.sku)})</option>`).join('');
+ const partnerOptions=data.partners.map(p=>`<option value="${p.id}">${escapeHtml(p.name)}</option>`).join('');
+ if(type==='vendors')opsBody.innerHTML=`<div class="card"><h3>Add Vendor</h3><input id="vendorName" placeholder="Vendor name"><input id="vendorContact" placeholder="Contact / phone / email"><button class="btn primary" onclick="addVendor()">Save Vendor</button></div><div class="card"><h3>Create Purchase Order</h3><select id="poVendor">${data.vendors.map(v=>`<option value="${v.id}">${escapeHtml(v.name)}</option>`).join('')}</select><select id="poProduct">${productOptions}</select><input id="poQty" type="number" min="1" value="1" placeholder="Cases"><input id="poUnitCost" type="number" min="0" step="0.01" placeholder="Cost per case"><input id="poExpected" type="date"><button class="btn primary" onclick="createPO()">Create Purchase Order</button></div><div class="card"><h3>Open Purchase Orders</h3>${data.purchaseOrders.map(po=>{let v=data.vendors.find(x=>x.id==po.vendorId),p=data.inventory.find(x=>x.id==po.productId);return `<div class="item"><b>${escapeHtml(v?.name||'Vendor')}</b><div>${escapeHtml(p?.name||'Product')} · ${po.qty} cases · ${money(po.qty*po.unitCost)}</div><div class="muted small">Expected ${po.expected||'Not set'} · ${po.status}</div>${po.status!=='Received'?`<button class="btn green" onclick="receivePO(${po.id})">Receive Into Inventory</button>`:''}</div>`}).join('')||'<div class="muted">No purchase orders</div>'}</div>`;
+ if(type==='returns')opsBody.innerHTML=`<div class="card"><h3>Record Return / Issue</h3><select id="retPartner"><option value="">Warehouse / internal</option>${partnerOptions}</select><select id="retProduct">${productOptions}</select><input id="retQty" type="number" min="1" value="1"><select id="retReason"><option>Returned</option><option>Damaged</option><option>Missing</option><option>Refused by store</option></select><select id="retAction"><option value="restock">Return to inventory</option><option value="remove">Remove from inventory</option><option value="note">Record only</option></select><textarea id="retNotes" placeholder="Notes"></textarea><button class="btn primary" onclick="recordReturn()">Save Record</button></div><div class="card">${data.returns.map(r=>`<div class="item"><b>${escapeHtml(r.productName)}</b> · ${r.qty} cases<div>${escapeHtml(r.reason)} · ${escapeHtml(r.action)}</div><div class="muted small">${new Date(r.createdAt).toLocaleString()} · ${escapeHtml(r.notes||'')}</div></div>`).join('')||'<div class="muted">No returns or damage records</div>'}</div>`;
+ if(type==='pricing')opsBody.innerHTML=`<div class="card"><label>Default Discount %</label><input id="setDiscount" type="number" min="0" max="100" step="0.01" value="${Number(data.settings.defaultDiscount||0)}"><label>Sales Tax %</label><input id="setTax" type="number" min="0" max="100" step="0.01" value="${Number(data.settings.taxRate||0)}"><label>Default Delivery Fee</label><input id="setFee" type="number" min="0" step="0.01" value="${Number(data.settings.deliveryFee||0)}"><button class="btn primary" onclick="savePricingSettings()">Save Pricing Rules</button><div class="notice">New route and prospect totals can use these defaults. Existing invoices keep their saved totals.</div></div>`;
+ if(type==='history')opsBody.innerHTML=`<div class="card"><button class="btn" onclick="manualAdjustment()">Make Inventory Adjustment</button></div><div class="card table-wrap"><table class="mini-table"><tr><th>Date</th><th>Product</th><th>Change</th><th>After</th><th>Reason</th><th>User</th></tr>${data.inventoryHistory.map(h=>`<tr><td>${new Date(h.createdAt).toLocaleString()}</td><td>${escapeHtml(h.productName)}</td><td>${h.change>0?'+':''}${h.change}</td><td>${h.after}</td><td>${escapeHtml(h.reason)}</td><td>${escapeHtml(h.user)}</td></tr>`).join('')}</table>${data.inventoryHistory.length?'':'<div class="muted">No stock history yet</div>'}</div>`;
+ if(type==='alerts'){const lows=data.inventory.filter(p=>Number(p.qty)<=Number(p.low));opsBody.innerHTML=`<div class="card">${lows.map(p=>`<div class="item alert-low"><b>${escapeHtml(p.name)}</b><div>${p.qty} cases left · reorder at ${p.low}</div><div class="muted small">${escapeHtml(warehouseLocation(p))}</div><button class="btn" onclick="quickPO(${p.id})">Create Purchase Order</button></div>`).join('')||'<div class="notice">No products are below their reorder level.</div>'}</div>`}
+ if(type==='schedule')opsBody.innerHTML=`<div class="card"><h3>Add Truck</h3><input id="truckName" placeholder="Truck name / number"><button class="btn" onclick="addTruck()">Add Truck</button></div><div class="card">${data.routes.map(r=>{let p=data.partners.find(x=>x.id==r.partnerId);return `<div class="item"><b>${escapeHtml(p?.name||'Store')}</b><label>Route Specialist</label><select id="driver-${r.id}">${data.employees.filter(e=>employeeTeam(e)==='Routes'||/route/i.test(e.role||'')).map(e=>`<option value="${e.id}" ${r.driverId==e.id?'selected':''}>${escapeHtml(e.name)}</option>`).join('')}</select><label>Truck</label><select id="truck-${r.id}">${data.trucks.map(t=>`<option value="${t.id}" ${r.truckId==t.id?'selected':''}>${escapeHtml(t.name)}</option>`).join('')}</select><label>Delivery date</label><input id="date-${r.id}" type="date" value="${r.deliveryDate||''}"><label>Departure time</label><input id="time-${r.id}" type="time" value="${r.departureTime||''}"><label>Stop order</label><input id="order-${r.id}" type="number" min="1" value="${r.stopOrder||1}"><button class="btn primary" onclick="saveRouteSchedule(${r.id})">Save Schedule</button></div>`}).join('')||'<div class="muted">No routes</div>'}</div>`;
+ if(type==='orders')opsBody.innerHTML=`<div class="card">${data.partners.map(p=>{let rs=data.routes.filter(r=>r.partnerId==p.id).sort((a,b)=>b.id-a.id);return `<details class="store-pick-details"><summary><b>${escapeHtml(p.name)}</b><div class="muted small">${rs.length} orders · Balance ${money(p.balance)}</div></summary><div class="store-pick-body">${rs.map(r=>`<div class="item"><b>${r.invoiceNumber||'Order #'+r.id}</b><div>${r.cases||0} cases · ${money(r.amount)} · ${r.status}</div><div class="muted small">Paid ${money(r.payment||0)} by ${escapeHtml(r.paymentMethod||'Not paid')} ${r.signedAt?'· '+new Date(r.signedAt).toLocaleDateString():''}</div>${r.status==='Completed'?`<button class="btn" onclick="openInvoice(${r.id},'Partner Copy')">View Invoice</button>`:''}</div>`).join('')||'<div class="muted">No orders</div>'}</div></details>`}).join('')}</div>`;
+ if(type==='permissions'){const roles=['owner','manager','warehouse','route','sales'];const actions=['editPrices','adjustInventory','manageEmployees','viewProfit','createOrders','completeDeliveries'];opsBody.innerHTML=`<div class="card"><div class="permission-grid">${roles.map(role=>`<details class="store-pick-details"><summary><b>${role.toUpperCase()}</b></summary><div class="store-pick-body">${actions.map(a=>`<label class="permission-row"><span>${a.replace(/([A-Z])/g,' $1')}</span><input style="width:auto" type="checkbox" id="perm-${role}-${a}" ${permissionAllowed(role,a)?'checked':''}></label>`).join('')}<button class="btn primary" onclick="savePermissions('${role}')">Save ${role} Permissions</button></div></details>`).join('')}</div></div>`}
+ if(type==='exports')opsBody.innerHTML=`<div class="card"><button class="btn primary" onclick="exportFullBackup()">Download Full JSON Backup</button><button class="btn" onclick="exportCSV('inventory')">Export Inventory CSV</button><button class="btn" onclick="exportCSV('partners')">Export Partners CSV</button><button class="btn" onclick="exportCSV('routes')">Export Orders & Payments CSV</button><button class="btn" onclick="exportCSV('activity')">Export Activity CSV</button></div>`;
+ if(type==='profit'){let completed=data.routes.filter(r=>r.status==='Completed');let revenue=completed.reduce((s,r)=>s+Number(r.amount||0),0);let cost=completed.reduce((s,r)=>s+(r.items||[]).reduce((a,i)=>{let p=data.inventory.find(x=>x.id==i.productId);return a+Number(i.qty||0)*Number(p?.cost||0)},0),0);let profit=revenue-cost;opsBody.innerHTML=`<div class="grid"><div class="metric"><span>Revenue</span><strong>${money(revenue)}</strong></div><div class="metric"><span>Product Cost</span><strong>${money(cost)}</strong></div><div class="metric"><span>Gross Profit</span><strong class="${profit>=0?'profit-positive':'profit-negative'}">${money(profit)}</strong></div><div class="metric"><span>Gross Margin</span><strong>${revenue?((profit/revenue)*100).toFixed(1):'0.0'}%</strong></div></div><div class="card table-wrap"><table class="mini-table"><tr><th>Product</th><th>Cost</th><th>Price</th><th>Profit/Case</th><th>Margin</th></tr>${data.inventory.map(p=>{let gp=Number(p.price||0)-Number(p.cost||0);return `<tr><td>${escapeHtml(p.name)}</td><td>${money(p.cost)}</td><td>${money(p.price)}</td><td>${money(gp)}</td><td>${p.price?((gp/p.price)*100).toFixed(1):'0.0'}%</td></tr>`}).join('')}</table></div>`}
+ openModal('opsModal')
+}
+function addVendor(){let name=$('vendorName').value.trim();if(!name)return alert('Enter vendor name');data.vendors.push({id:Date.now(),name,contact:$('vendorContact').value.trim()});logActivity('Vendor added: '+name);save();openOpsPanel('vendors')}
+function createPO(){let vendorId=+$('poVendor').value,productId=+$('poProduct').value,qty=+$('poQty').value||0,unitCost=+$('poUnitCost').value||0;if(!vendorId||!productId||qty<1)return alert('Choose vendor, product, and quantity');data.purchaseOrders.unshift({id:Date.now(),vendorId,productId,qty,unitCost,expected:$('poExpected').value,status:'Ordered',createdAt:new Date().toISOString()});logActivity('Purchase order created');save();openOpsPanel('vendors')}
+function receivePO(id){let po=data.purchaseOrders.find(x=>x.id==id),p=data.inventory.find(x=>x.id==po.productId);if(!po||!p)return;p.qty=Number(p.qty||0)+Number(po.qty||0);if(po.unitCost)p.cost=po.unitCost;po.status='Received';po.receivedAt=new Date().toISOString();addInventoryHistory(p.id,po.qty,'Purchase order received','PO '+po.id);logActivity('PO received: '+p.name+' +'+po.qty);save();openOpsPanel('vendors')}
+function quickPO(productId){openOpsPanel('vendors');setTimeout(()=>{if($('poProduct'))$('poProduct').value=productId},100)}
+function recordReturn(){let productId=+$('retProduct').value,qty=+$('retQty').value||0,action=$('retAction').value,p=data.inventory.find(x=>x.id==productId);if(!p||qty<1)return alert('Choose product and quantity');let change=action==='restock'?qty:action==='remove'?-qty:0;p.qty=Math.max(0,Number(p.qty||0)+change);let rec={id:Date.now(),partnerId:+$('retPartner').value||null,productId,productName:p.name,qty,reason:$('retReason').value,action,notes:$('retNotes').value.trim(),createdAt:new Date().toISOString(),user:currentUserLabel()};data.returns.unshift(rec);if(change)addInventoryHistory(productId,change,rec.reason,'Return '+rec.id);logActivity(rec.reason+': '+p.name+' '+qty);save();openOpsPanel('returns')}
+function savePricingSettings(){data.settings.defaultDiscount=+$('setDiscount').value||0;data.settings.taxRate=+$('setTax').value||0;data.settings.deliveryFee=+$('setFee').value||0;logActivity('Pricing rules updated');save();closeModal('opsModal')}
+function manualAdjustment(){let sku=prompt('Enter product SKU or barcode');if(!sku)return;let p=data.inventory.find(x=>String(x.sku).toLowerCase()===sku.toLowerCase());if(!p)return alert('Product not found');let change=Number(prompt('Enter quantity change. Use - for removal.','0'));if(!Number.isFinite(change)||change===0)return;let reason=prompt('Reason for adjustment','Manual count correction')||'Manual adjustment';p.qty=Math.max(0,Number(p.qty||0)+change);addInventoryHistory(p.id,change,reason);logActivity('Inventory adjusted: '+p.name+' '+(change>0?'+':'')+change);save();openOpsPanel('history')}
+function addTruck(){let name=$('truckName').value.trim();if(!name)return;data.trucks.push({id:Date.now(),name});save();openOpsPanel('schedule')}
+function saveRouteSchedule(id){let r=data.routes.find(x=>x.id==id);r.driverId=+$('driver-'+id).value||null;r.truckId=+$('truck-'+id).value||null;r.deliveryDate=$('date-'+id).value;r.departureTime=$('time-'+id).value;r.stopOrder=+$('order-'+id).value||1;logActivity('Route scheduled for '+r.deliveryDate);save();openOpsPanel('schedule')}
+const defaultPermissions={owner:{editPrices:true,adjustInventory:true,manageEmployees:true,viewProfit:true,createOrders:true,completeDeliveries:true},manager:{editPrices:true,adjustInventory:true,manageEmployees:true,viewProfit:true,createOrders:true,completeDeliveries:true},warehouse:{editPrices:false,adjustInventory:true,manageEmployees:false,viewProfit:false,createOrders:false,completeDeliveries:false},route:{editPrices:false,adjustInventory:false,manageEmployees:false,viewProfit:false,createOrders:false,completeDeliveries:true},sales:{editPrices:false,adjustInventory:false,manageEmployees:false,viewProfit:false,createOrders:true,completeDeliveries:false}};
+function permissionAllowed(role,action){return data.permissions?.[role]?.[action]??defaultPermissions[role]?.[action]??false}
+function savePermissions(role){if(!data.permissions[role])data.permissions[role]={};['editPrices','adjustInventory','manageEmployees','viewProfit','createOrders','completeDeliveries'].forEach(a=>data.permissions[role][a]=!!$('perm-'+role+'-'+a).checked);logActivity(role+' permissions updated');save();openOpsPanel('permissions')}
+function exportFullBackup(){downloadText('STB_ONE_BACKUP_'+new Date().toISOString().slice(0,10)+'.json',JSON.stringify(data,null,2),'application/json')}
+function exportCSV(type){let rows=[];if(type==='inventory')rows=[['Name','SKU','Qty','Reorder','Cost','Price','Location'],...data.inventory.map(p=>[p.name,p.sku,p.qty,p.low,p.cost,p.price,warehouseLocation(p)])];if(type==='partners')rows=[['Name','Address','Balance','Contact'],...data.partners.map(p=>[p.name,p.address,p.balance,p.contact||''])];if(type==='routes')rows=[['Order','Partner','Status','Cases','Total','Payment','Method','Date'],...data.routes.map(r=>[r.invoiceNumber||r.id,data.partners.find(p=>p.id==r.partnerId)?.name||'',r.status,r.cases,r.amount,r.payment||0,r.paymentMethod||'',r.signedAt||r.deliveryDate||''])];if(type==='activity')rows=[['Activity'],...(data.activity||[]).map(x=>[x])];downloadText('STB_'+type+'_'+new Date().toISOString().slice(0,10)+'.csv',rows.map(r=>r.map(csvEscape).join(',')).join('\n'),'text/csv')}
+
+saveProductBtn.addEventListener('click',saveProduct);scanProductBarcodeBtn.addEventListener('click',()=>useCameraScanner('product'));takeProductPhotoBtn.addEventListener('click',()=>pImage.click());pImage.addEventListener('change',handleProductPhoto);scanCaseBtn.addEventListener('click',()=>scanCase());cameraScanBtn.addEventListener('click',()=>useCameraScanner('warehouse'));scanCode.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();scanCase()}});
+routeInfoTabBtn?.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();showRouteDetailTab('info')});routePickTabBtn?.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();showRouteDetailTab('pick')});
+document.getElementById('inventorySearch')?.addEventListener('input',renderInventory);document.getElementById('routeProductSearch')?.addEventListener('input',renderRouteProductChoices);document.getElementById('salesProductSearch')?.addEventListener('input',()=>renderSalesOrderItems());document.getElementById('warehouseProductSearch')?.addEventListener('input',renderLoad);
+initSignaturePad();sendChatBtn?.addEventListener('click',sendChatMessage);teamChatTabBtn?.addEventListener('click',()=>switchChatMode('team'));directChatTabBtn?.addEventListener('click',()=>switchChatMode('direct'));directRecipient?.addEventListener('change',loadDirectMessages);sendDirectChatBtn?.addEventListener('click',sendDirectMessage);refreshChatBtn?.addEventListener('click',()=>{loadShared(true);if(activeChatMode==='direct')loadDirectMessages()});chatInput?.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendChatMessage()}});directChatInput?.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendDirectMessage()}});
+renderAll();setInterval(()=>{if(!appView.classList.contains('hidden')){loadShared(false);if(activeChatMode==='direct'&&document.querySelector('[data-section=chat]')?.classList.contains('active'))loadDirectMessages()}},4000)
+</script>
+
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('./service-worker.js').catch(() => {}));
+}
+</script>
+</body>
+</html>
